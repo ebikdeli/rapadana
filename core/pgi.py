@@ -1,7 +1,7 @@
 """
     This code writen for ZarinPal pgi, but we can use it for any REST pgi service with minimal changes
 """
-from django.http import JsonResponse
+# from django.http import JsonResponse
 from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import reverse
@@ -53,9 +53,10 @@ def zarin_pay_verify(request, authority):
     if r.status_code == 200 or 201:
         zarin_response = r.json()
         if zarin_response['data']:
-            messages.success(request, f'تاییدیه تراکنش شما: {authority}')
+            return {'verify': f'تاییدیه تراکنش شما: {authority}'}
         else:
-            zarin_response_code(request, zarin_response)
+            error = zarin_response_code(request, zarin_response)
+            return {'error': error}
 
 
 def zarin_pay(request):
@@ -67,16 +68,24 @@ def zarin_pay(request):
         customer_name = request.GET.get('name', None)
         order_id = request.GET.get('order_id', None)
         if not customer_name:
-            return JsonResponse(data={'request error': 'No customer name received'}, safe=False)
+            # return JsonResponse(data={'request error': 'No customer name received'}, safe=False)
+            data={'request error': 'No customer name received'}
+            return data
         if not order_id:
-            return JsonResponse(data={'request error': 'No order_id received'}, safe=False)
+            # return JsonResponse(data={'request error': 'No order_id received'}, safe=False)
+            data={'request error': 'No order_id received'}
+            return data
         # customer = Customer.objects.filter(name__icontain=customer_name)
         customer = Customer.objects.filter(name__iexact=customer_name)
         if not customer.exists():
-            return JsonResponse(data={'response error': 'There is no customer with the requested name'}, safe=False)
+            # return JsonResponse(data={'error': 'There is no customer with the requested name'}, safe=False)
+            data={'error': 'There is no customer with the requested name'}
+            return data
         order = Order.objects.filter(order_id=order_id)
         if not order.exists():
-            return JsonResponse(data={'response error': 'There is no order registered with requested id'}, safe=False)
+            # return JsonResponse(data={'error': 'There is no order registered with requested id'}, safe=False)
+            data={'error': 'There is no order registered with requested id'}
+            return data
         if not customer.email:
             customer.email = 'ثبت نشده'
         # if not user.email:
@@ -100,7 +109,8 @@ def zarin_pay(request):
         try:
             r = requests.post(url=url, data=json.dumps(data), headers=headers)
         except requests.ConnectionError:
-            return JsonResponse(data={'برقراری با ارتباط با واسط پرداخت به مشکل برخورده'}, safe=True)
+            # return JsonResponse(data={'برقراری با ارتباط با واسط پرداخت به مشکل برخورده'}, safe=True)
+            return data
         if r.status_code == 200 or 201:
             zarin_response = r.json()
             # If request was a success:
@@ -108,16 +118,23 @@ def zarin_pay(request):
                 authority = zarin_response['data']['authority']
                 new_url = f'https://www.zarinpal.com/pg/StartPay/{authority}'
                 # Redirect user to PGI to pay
-                return JsonResponse(data={'url': new_url})
+                # return JsonResponse(data={'url': new_url})
+                data={'url': new_url}
+                return data
             # If there is a error:
             else:
                 error = zarin_response_code(request, zarin_response)
-                return JsonResponse(data={'error': error})
+                # return JsonResponse(data={'error': error})
+                data={'error': error}
+                return data
         else:
-            return JsonResponse(data={'connection error': 'ارتباط با سایت پذیرنده ممکن نمی باشد'}, safe=False)
+            # return JsonResponse(data={'error': 'ارتباط با سایت پذیرنده ممکن نمی باشد'}, safe=False)
+            data={'error': 'ارتباط با سایت پذیرنده ممکن نمی باشد'}
+            return data
     else:
-        return JsonResponse(data={'method error': 'only "GET" method could be used'}, safe=False)
-        sdfa = 
+        # return JsonResponse(data={'error': 'only "GET" method could be used'}, safe=False)
+        data={'error': 'only "GET" method could be used'}
+        return data
 
 
 def zarin_verify(request):
@@ -128,13 +145,15 @@ def zarin_verify(request):
     cart.authority = data['Authority']
     cart.save()
     # Helper method called
-    zarin_pay_verify(request, authority)
+    response = zarin_pay_verify(request, authority)
     if data['Status'] == 'OK':
-        messages.success(request, 'سفارش شما با موفقیت ثبت شد.')
-        return reverse('order:receipt')
+        # return JsonResponse(data={'success': 'سفارش شما با موفقیت ثبت شد.'}, safe=False)
+        data={'success': 'سفارش شما با موفقیت ثبت شد.'}
+        return data.update(response)
     if data['Status'] == 'NOK':
-        messages.add_message(request, messages.SUCCESS, 'پرداخت انجام نگرفت و سفارشی ثبت نگردید')
-        return reverse('cart:show_cart')
+        # return JsonResponse(data={'error': 'پرداخت انجام نگرفت و سفارشی ثبت نگردید'}, safe=False)
+        data={'error': 'پرداخت انجام نگرفت و سفارشی ثبت نگردید'}
+        return data.update(response)
 
 
 """
