@@ -1,0 +1,1 @@
+web: gunicorn flytech.wsgi --log-file -

@@ -12,6 +12,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'django_filters',
+    'corsheaders',
     # 'rest_framework.authtoken',
     # 'taggit',
     # 'django_quill',
@@ -24,6 +25,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     # 'django.middleware.cache.UpdateCacheMiddleware',        # for per site cache
@@ -186,3 +188,9 @@ REST_FRAMEWORK = {
     ]
 }
 """
+
+# cors headers settings
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+# CORS_ALLOWED_ORIGINS = ['http://localhost:3030', ]
