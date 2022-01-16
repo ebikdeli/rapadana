@@ -11,9 +11,10 @@ from .models import Customer, Order
 import requests
 import json
 
-
+# This is 'heroku' callback url
+CALLBACK_URL = 'https://rapdana.herokuapp.com/api/pay/cart/'
 # This is local callback url
-CALLBACK_URL = 'http://127.0.0.1:8000/api/pay/cart/'
+# CALLBACK_URL = 'http://127.0.0.1:8000/api/pay/cart/'
 if not settings.DEBUG:
     # This is website callback url
     CALLBACK_URL = 'https://www.example/api/pay/cart/'
