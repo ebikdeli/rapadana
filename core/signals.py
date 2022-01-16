@@ -21,7 +21,7 @@ def slug_order(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender='core.Order')
-def generate_order_id(sender, created, instance, **kwargs):
+def generate_order_id(sender, instance, created, **kwargs):
     """Generate random id for any order would be created by admin"""
     if created:
         instance.order_id = generate_order_id()
