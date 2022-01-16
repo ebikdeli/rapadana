@@ -24,7 +24,7 @@ def slug_order(sender, instance, created, **kwargs):
 def generate_order_id(sender, instance, created, **kwargs):
     """Generate random id for any order would be created by admin"""
     if created:
-        instance.order_id = generate_order_id()
+        instance.order_id = generate_random_id()
 
 
 def generate_random_id(length=10):
