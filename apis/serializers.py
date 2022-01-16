@@ -16,7 +16,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 class CustomerSerializer(serializers.HyperlinkedModelSerializer):
     """Serializer for Cutomer model"""
-    url = serializers.HyperlinkedIdentityField(view_name='api:customer-detail')
+    url = serializers.HyperlinkedIdentityField(view_name='api:customer-detail', lookup_field='name')
 
     class Meta:
         model = Customer
