@@ -1,4 +1,3 @@
-from django.http import JsonResponse
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
@@ -29,6 +28,7 @@ class OrderViewSet(ModelViewSet):
     filter_class = OrderFilterset
 
     def list(self, request, *args, **kwargs):
+        """Overwrite 'list' method of Viewset"""
         name = request.GET.get('name', None)
         order_id = request.GET.get('order_id', None)
         # If order requested based on 'cutomer name'

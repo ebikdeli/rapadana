@@ -1,4 +1,4 @@
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
@@ -32,6 +32,5 @@ def generate_random_id(length=10):
     # 'length' is the numbers of charcters in the string
     import random
     import string
-    # call random.choices() string module to find the string in Uppercase + numeric data.
     ran = ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
     return ran
