@@ -1,7 +1,7 @@
 from atexit import register
 from django.contrib import admin
 
-from .models import Order
+from .models import Customer, Order
 
 
-admin.site.register(Order)
+admin.site.register([Customer, Order])

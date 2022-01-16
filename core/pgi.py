@@ -4,7 +4,7 @@
 # from django.http import JsonResponse
 from django.conf import settings
 from django.contrib import messages
-from django.shortcuts import reverse
+# from django.shortcuts import reverse
 
 from .models import Customer, Order
 
@@ -13,12 +13,14 @@ import json
 
 
 # This is local callback url
-CALLBACK_URL = 'http://127.0.0.1:8000/order/cart_pay/'
+CALLBACK_URL = 'http://127.0.0.1:8000/api/pay/cart/'
 if not settings.DEBUG:
     # This is website callback url
-    CALLBACK_URL = 'https://www.example/order/cart_pay/'
+    CALLBACK_URL = 'https://www.example/api/pay/cart/'
 ZARIN_MERCHANT_ID = 'b46922ec-f436-402b-a553-4107451475cc'
 
+NAME = ''
+ORDER_ID = ''
 
 def zarin_response_code(request, zarin_response):
     """Helper function to decode if any error messages in payment process"""
@@ -69,11 +71,11 @@ def zarin_pay(request):
         order_id = request.GET.get('order_id', None)
         if not customer_name:
             # return JsonResponse(data={'request error': 'No customer name received'}, safe=False)
-            data={'request error': 'No customer name received'}
+            data={'error': 'No customer name received'}
             return data
         if not order_id:
             # return JsonResponse(data={'request error': 'No order_id received'}, safe=False)
-            data={'request error': 'No order_id received'}
+            data={'error': 'No order_id received'}
             return data
         # customer = Customer.objects.filter(name__icontain=customer_name)
         customer = Customer.objects.filter(name__iexact=customer_name)
@@ -86,6 +88,10 @@ def zarin_pay(request):
             # return JsonResponse(data={'error': 'There is no order registered with requested id'}, safe=False)
             data={'error': 'There is no order registered with requested id'}
             return data
+        customer = customer.first()
+        order = order.first()
+        global NAME; NAME = customer_name
+        global ORDER_ID; ORDER_ID =order_id
         if not customer.email:
             customer.email = 'ثبت نشده'
         # if not user.email:
@@ -104,12 +110,13 @@ def zarin_pay(request):
             'description': f'هزینه طراحی برنامه تحت وب',
             'callback_url': CALLBACK_URL,
             'metadata': {'email': customer.email,
-                        'phone': customer.phone}
+                         'phone': customer.phone}
                 }
         try:
             r = requests.post(url=url, data=json.dumps(data), headers=headers)
         except requests.ConnectionError:
             # return JsonResponse(data={'برقراری با ارتباط با واسط پرداخت به مشکل برخورده'}, safe=True)
+            data={'برقراری با ارتباط با واسط پرداخت به مشکل برخورده'}
             return data
         if r.status_code == 200 or 201:
             zarin_response = r.json()
@@ -140,20 +147,29 @@ def zarin_pay(request):
 def zarin_verify(request):
     """Used in the last step to verify the payment then redirect user to receipt"""
     data = request.GET
-    cart = request.user.cart.first()
+    # cart = request.user.cart.first()
     authority = data['Authority']
-    cart.authority = data['Authority']
-    cart.save()
+    # cart.authority = data['Authority']
+    # cart.save()
     # Helper method called
     response = zarin_pay_verify(request, authority)
+    global ORDER_ID
+    order = Order.objects.get(order_id=ORDER_ID)
+    order.authority = authority
+    order.is_paid = True
+    order.save()
     if data['Status'] == 'OK':
         # return JsonResponse(data={'success': 'سفارش شما با موفقیت ثبت شد.'}, safe=False)
         data={'success': 'سفارش شما با موفقیت ثبت شد.'}
-        return data.update(response)
+        data.update(response)
+        print(data)
+        return data
     if data['Status'] == 'NOK':
         # return JsonResponse(data={'error': 'پرداخت انجام نگرفت و سفارشی ثبت نگردید'}, safe=False)
-        data={'error': 'پرداخت انجام نگرفت و سفارشی ثبت نگردید'}
-        return data.update(response)
+        data={'success': 'پرداخت انجام گرفت اما تاییدیه صادر نشد'}
+        data.update(response)
+        print(data)
+        return data
 
 
 """

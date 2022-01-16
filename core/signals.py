@@ -15,8 +15,9 @@ def slug_customer(sender, instance, created, **kwargs):
 @receiver(post_save, sender='core.Order')
 def slug_order(sender, instance, created, **kwargs):
     """Fill 'slug' field in Order model"""
-    if instance.customer.exists():
-        current_customer = instance.customer.first()
+    print(type(instance.customer))
+    if instance.customer:
+        current_customer = instance.customer
         if created:
             if current_customer.name:
                 instance.slug = f'{current_customer.name}_order'

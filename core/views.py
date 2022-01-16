@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .pgi import zarin_pay, zarin_verify
 
 
-@login_required
+# @login_required
 def pay(request):
     """First step of payment. This view redirect user to pgi to enter his/her ID cart"""
     data = zarin_pay(request)

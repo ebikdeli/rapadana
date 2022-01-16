@@ -1,9 +1,9 @@
 #BACKEND
 
-!__init__.py
 **/__pycharm__*
 **__pychache__/**
 **/migrations/**
+!__init__.py
 **.pyc
 *.pyc
 *.idea/**
