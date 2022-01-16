@@ -1,1 +1,1 @@
-web: gunicorn flytech.wsgi --log-file -
+web: gunicorn rapadana.wsgi --log-file -
