@@ -10,6 +10,7 @@ app_name = 'api'
 router = DefaultRouter()
 router.register('customers', views.CustomerViewSet, 'customer')
 router.register('order', views.OrderViewSet, 'order')
+router.register('user', views.UserViewSet, 'user')
 
 urlpatterns = [
     path('', include(router.urls)),

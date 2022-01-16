@@ -1,6 +1,15 @@
 from django_filters import rest_framework as filters
+from django.contrib.auth import get_user_model
 
 from core.models import Customer, Order
+
+
+class UserFilterset(filters.FilterSet):
+    """Filterset for User model"""
+    
+    class Meta:
+        model = get_user_model()
+        exclude = ['picture', 'background']
 
 
 class CustomerFilterset(filters.FilterSet):

@@ -1,6 +1,17 @@
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
 
 from core.models import Customer, Order
+
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    """Serializer for User model"""
+    url = serializers.HyperlinkedIdentityField(view_name='api:user-detail')
+
+    class Meta:
+        model = get_user_model()
+        fields = ['url', 'id', 'username', 'password', 'phone', 'email', 'is_superuser', 'is_admin', 'picture', 'background', 'first_name',
+                  'last_name', 'name', 'date_joined']
 
 
 class CustomerSerializer(serializers.HyperlinkedModelSerializer):
@@ -10,6 +21,7 @@ class CustomerSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Customer
         fields = '__all__'
+        lookup_field = 'name'
 
 
 class OrderSerializer(serializers.HyperlinkedModelSerializer):

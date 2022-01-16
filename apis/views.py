@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
@@ -5,8 +6,22 @@ from rest_framework import status
 from django_filters import rest_framework as filter
 
 from core.models import Customer, Order
-from .serializers import CustomerSerializer, OrderSerializer
-from .filters import OrderFilterset, CustomerFilterset
+from .serializers import CustomerSerializer, OrderSerializer, UserSerializer
+from .filters import OrderFilterset, CustomerFilterset , UserFilterset
+
+
+class UserViewSet(ModelViewSet):
+    """Viewset for User"""
+    queryset = get_user_model().objects.all()
+    serializer_class = UserSerializer
+    # permission_classes = [IsAdminUser, ]
+    permission_classes = [AllowAny, ]
+    filter_backends = [filter.DjangoFilterBackend, ]
+    filter_class = UserFilterset
+
+    def list(self, request, *args, **kwargs):
+        serializer = UserSerializer(self.queryset, many=True, context={'request': self.request})
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class CustomerViewSet(ModelViewSet):
@@ -17,6 +32,7 @@ class CustomerViewSet(ModelViewSet):
     permission_classes = [AllowAny, ]
     filter_backends = [filter.DjangoFilterBackend, ]
     filter_class = CustomerFilterset
+    lookup_field = 'name'
 
 
 class OrderViewSet(ModelViewSet):
