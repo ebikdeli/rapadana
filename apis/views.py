@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework import status
 from django_filters import rest_framework as filter
@@ -14,6 +14,7 @@ class CustomerViewSet(ModelViewSet):
     """Viewset for Customer"""
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    # permission_classes = [IsAdminUser, ]
     permission_classes = [AllowAny, ]
     filter_backends = [filter.DjangoFilterBackend, ]
     filter_class = CustomerFilterset
@@ -53,11 +54,12 @@ class OrderViewSet(ModelViewSet):
                 order_queryset_serializer = OrderSerializer(order_queryset.first(), context={'request': request})
             else:
                 order_queryset_serializer = OrderSerializer(order_queryset.none())
-            return Response(data={'order': order_queryset}, status=status.HTTP_200_OK)
-        # Or if user is admin send all orders to admin else return None
+            return Response(data={'order': order_queryset_serializer.data}, status=status.HTTP_200_OK)
+        # Or if user is admin show all orders to admin
         if self.request.user.is_authenticated:
             orders = Order.objects.all()
             order_serializer = OrderSerializer(orders, many=True, context={'request': request})
             return Response(data={'orders': order_serializer.data}, status=status.HTTP_200_OK)
+        # If user in not authenticated as admin, Do not return any information from database to user.
         else:
             return Response(data={'info': 'No order id or customer name entered'}, status=status.HTTP_204_NO_CONTENT)

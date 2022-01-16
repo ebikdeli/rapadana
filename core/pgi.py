@@ -26,7 +26,7 @@ def zarin_response_code(request, zarin_response):
     """Helper function to decode if any error messages in payment process"""
     code = zarin_response['errors']['code']
     if code == -9:
-        error = 'موجودی باید بیش از 100 ریال بشد'
+        error = 'موجودی باید بیش از 1000 ریال بشد'
     elif code == -10:
         error = 'آدرس آی پی یا مرچنت کد پذیرنده صحیح نیست'
     elif code == -12:
@@ -155,7 +155,9 @@ def zarin_verify(request):
     response = zarin_pay_verify(request, authority)
     global ORDER_ID
     order = Order.objects.get(order_id=ORDER_ID)
+    from core.signals import generate_random_id
     order.authority = authority
+    order.peigiry = generate_random_id(6)
     order.is_paid = True
     order.save()
     if data['Status'] == 'OK':
