@@ -1,17 +1,17 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
 
-@receiver(post_save, sender='core.Customer')
-def slug_customer(sender, instance, created, **kwargs):
+@receiver(pre_save, sender='core.Customer')
+def slug_customer(sender, instance, **kwargs):
     """Fill 'slug' field in Customer model"""
     if not instance.slug:
         if instance.name:
             instance.slug = instance.name
 
 
-@receiver(post_save, sender='core.Order')
-def slug_order(sender, instance, created, **kwargs):
+@receiver(pre_save, sender='core.Order')
+def slug_order(sender, instance, **kwargs):
     """Fill 'slug' field in Order model"""
     if not instance.slug:
         if instance.customer:
@@ -20,10 +20,10 @@ def slug_order(sender, instance, created, **kwargs):
                 instance.slug = f'{current_customer.name}_order'
 
 
-@receiver(post_save, sender='core.Order')
-def generate_order_id(sender, instance, created, **kwargs):
+@receiver(pre_save, sender='core.Order')
+def generate_order_id(sender, instance, **kwargs):
     """Generate random id for any order would be created by admin"""
-    if created:
+    if not instance.order_id:
         instance.order_id = generate_random_id()
 
 
