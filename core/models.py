@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 class Customer(models.Model):
     """This model represents Customer. It is simple and basic"""
-    name = models.CharField(verbose_name=_('customer name'), max_length=100, unique=True)
+    name = models.CharField(verbose_name=_('customer name'), max_length=100)
     email = models.EmailField(verbose_name=_('customer email'), blank=True)
     address = models.TextField(verbose_name=_('customer address'), blank=True)
     phone = models.CharField(verbose_name=_('customer phone number'),

@@ -100,14 +100,16 @@ class OrderSerializer(serializers.HyperlinkedModelSerializer):
             # If customer data already is in database:
             if received_customer.exists():
                 received_customer = received_customer.first()
-                Customer.objects.filter(received_customer.id).update(**customer_data)
+                Customer.objects.filter(id=received_customer.id).update(**customer_data)
                 received_customer.refresh_from_db()
                 # If 'customer' field of the current order instance is not current 'customer':
                 if instance.customer.id != received_customer.id:
                     instance.customer = received_customer
+                    instance.save()
             else:
                 new_customer = Customer.objects.create(**customer_data)
                 instance.customer = new_customer
+                instance.save()
             Order.objects.filter(id=instance.id).update(**validated_data)
             instance.refresh_from_db()
             instance.save()
