@@ -9,3 +9,5 @@ In the 'apis' app, for the 'Customer' model we use the 'name' field as lookup fi
 IMPORTANT: We included 'migrations' and 'database' to the git project because of heroku stupidity.
 
 We used DRF Validations in Serializers.
+
+Serializer inheritance used in the project for security reasons.

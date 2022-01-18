@@ -1,3 +1,9 @@
+"""
+To show or use some fields to admin without showing them to users, we can have two Serializers and
+implement needed logic in each Serializers or in the 'view'. It might needs more time and be a tedious
+job but it would be more secure and is more managable and straithforward.
+https://www.django-rest-framework.org/api-guide/serializers/#serializer-inheritance
+"""
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework import status
@@ -22,8 +28,19 @@ class CustomerSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Customer
-        fields = '__all__'
+        # NOTE if we want to use 'serializer inheritance' later and also inherit Meta class of parent and we want
+        # to use '__all__ fields, we better exclude EMPTY LIST instead of '__all__' for fields. NOTE #
+        # fields = '__all__'
+        exclude = []
         lookup_field = 'name'
+
+
+class CustomerUserSerializer(CustomerSerializer):
+    """This Serializer used for ordinary users. It inherit all fields of parent except for 'url' field"""
+    url = None
+
+    class Meta(CustomerSerializer.Meta):
+        exclude = ['url', ]
 
 
 class OrderSerializer(serializers.HyperlinkedModelSerializer):
@@ -37,7 +54,8 @@ class OrderSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Order
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = []
     
     def create(self, validated_data):
         """'validated_data' is a dictionary consists of the data sent from client to serializer"""
@@ -119,3 +137,12 @@ class OrderSerializer(serializers.HyperlinkedModelSerializer):
             Order.objects.filter(instance.id).update(**validated_data)
             instance.refresh_from_db()
             instance.save()
+
+
+class OrderUserSerializer(OrderSerializer):
+    """This Serializer used for ordinary users. It inherit all fields of parent except for 'url' field"""
+    url = None
+    # customer = None
+    customer = CustomerUserSerializer(many=False, read_only=True)
+    class Meta(OrderSerializer.Meta):
+        exclude = ['url', ]

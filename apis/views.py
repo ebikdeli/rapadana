@@ -6,7 +6,7 @@ from rest_framework import status
 from django_filters import rest_framework as filter
 
 from core.models import Customer, Order
-from .serializers import CustomerSerializer, OrderSerializer, UserSerializer
+from .serializers import CustomerSerializer, OrderSerializer, UserSerializer, OrderUserSerializer
 from .filters import OrderFilterset, CustomerFilterset , UserFilterset
 
 
@@ -28,8 +28,8 @@ class CustomerViewSet(ModelViewSet):
     """Viewset for Customer"""
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
-    # permission_classes = [IsAdminUser, ]
-    permission_classes = [AllowAny, ]
+    permission_classes = [IsAdminUser, ]
+    # permission_classes = [AllowAny, ]
     filter_backends = [filter.DjangoFilterBackend, ]
     filter_class = CustomerFilterset
     # NOTE By default lookup_field based on 'pk'. For 'HyperlinkedModelSerializer' we should also set 'lookup_field'
@@ -48,6 +48,10 @@ class OrderViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         """Overwrite 'list' method of Viewset"""
+        if not request.user.is_authenticated:
+            OrderSerializer = OrderUserSerializer
+        else:
+            OrderSerializer = self.serializer_class
         name = request.GET.get('name', None)
         order_id = request.GET.get('order_id', None)
         # If order requested based on 'cutomer name': #
