@@ -12,8 +12,8 @@ def pay(request):
     return JsonResponse(data=data, safe=False)
 
 
-def cart_pay(request):
+def cart_pay(request, order_id=None):
     """It's the second step towards payment. After payment we should verify if payment was a success or not"""
-    data = zarin_verify(request)
+    data = zarin_verify(request, order_id)
     return JsonResponse(data=data, safe=False)
     # return redirect(data)
