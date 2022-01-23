@@ -1,4 +1,4 @@
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
 
@@ -8,6 +8,16 @@ def slug_customer(sender, instance, **kwargs):
     if not instance.slug:
         if instance.name:
             instance.slug = instance.name
+
+
+@receiver(post_save, sender='core.Order')
+def count_remain_price(sender, instance, created, **kwargs):
+    """Count remain price after creating new Order"""
+    if created:
+        instance.remain = instance.price
+    if instance.price and instance.remain < 0:
+        instance.remain = instance.price
+    instance.save()
 
 
 @receiver(pre_save, sender='core.Order')

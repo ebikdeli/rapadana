@@ -22,7 +22,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
                   'last_name', 'name', 'date_joined']
 
 
-class CustomerSerializer(serializers.HyperlinkedModelSerializer):
+class CustomerAdminSerializer(serializers.HyperlinkedModelSerializer):
     """Serializer for Cutomer model"""
     url = serializers.HyperlinkedIdentityField(view_name='api:customer-detail', lookup_field='name')
 
@@ -35,22 +35,22 @@ class CustomerSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field = 'name'
 
 
-class CustomerUserSerializer(CustomerSerializer):
+class CustomerUserSerializer(CustomerAdminSerializer):
     """This Serializer used for ordinary users. It inherit all fields of parent except for 'url' field"""
     url = None
 
-    class Meta(CustomerSerializer.Meta):
+    class Meta(CustomerAdminSerializer.Meta):
         exclude = ['url', ]
 
 
-class OrderSerializer(serializers.HyperlinkedModelSerializer):
+class OrderAdminSerializer(serializers.HyperlinkedModelSerializer):
     """"Serializer for Order model"""
     url = serializers.HyperlinkedIdentityField(view_name='api:order-detail', lookup_field='order_id')
     # Because 'customer' have one to many relation with 'order', we cannot set 'many' attribute to 'True' in below fields or
     # we get this TypeError: "'customer' is not iterable" #
-    customer = CustomerSerializer(many=False, read_only=True)
+    customer = CustomerAdminSerializer(many=False, read_only=True)
     customer_obj = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all(), many=False, write_only=True, allow_null=True)
-    customer_data = CustomerSerializer(write_only=True)
+    customer_data = CustomerAdminSerializer(write_only=True)
 
     class Meta:
         model = Order
@@ -139,10 +139,10 @@ class OrderSerializer(serializers.HyperlinkedModelSerializer):
             instance.save()
 
 
-class OrderUserSerializer(OrderSerializer):
+class OrderUserSerializer(OrderAdminSerializer):
     """This Serializer used for ordinary users. It inherit all fields of parent except for 'url' field"""
     url = None
     # customer = None
     customer = CustomerUserSerializer(many=False, read_only=True)
-    class Meta(OrderSerializer.Meta):
+    class Meta(OrderAdminSerializer.Meta):
         exclude = ['url', ]

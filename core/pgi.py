@@ -1,10 +1,11 @@
 """
-    This code writen for ZarinPal pgi, but we can use it for any REST pgi service with minimal changes
+    This code writen for ZarinPal pgi, but we can use it for any REST pgi service with minimal changes.
+    Note: Using 'global variables' increases the risk of process race between users and expose a user data
+    to other users. In 2 ways we can solve this issue: 1- Using 'session' to save the data needed between
+    multiple views in session based authentication and 2- Use additional headers or variables in token based
+    authentication.
 """
-# from django.http import JsonResponse
 from django.conf import settings
-from django.contrib import messages
-# from django.shortcuts import reverse
 
 from .models import Customer, Order
 
@@ -22,6 +23,7 @@ ZARIN_MERCHANT_ID = 'b46922ec-f436-402b-a553-4107451475cc'
 
 NAME = ''
 ORDER_ID = ''
+PRICE = 0
 
 def zarin_response_code(request, zarin_response):
     """Helper function to decode if any error messages in payment process"""
@@ -41,12 +43,12 @@ def zarin_response_code(request, zarin_response):
     return error
 
 
-def zarin_pay_verify(request, authority):
+def zarin_pay_verify(request, authority, pay):
     """Helper function used to verify the payment"""
     url = 'https://api.zarinpal.com/pg/v4/payment/verify.json'
     data = {
         'merchant_id': ZARIN_MERCHANT_ID,
-        # 'amount': int(cart.total_price * 100),
+        # 'amount': int(pay) * 10,
         'amount': 1000,
         'authority': authority
             }
@@ -91,8 +93,10 @@ def zarin_pay(request):
             return data
         customer = customer.first()
         order = order.first()
-        global NAME; NAME = customer_name
-        global ORDER_ID; ORDER_ID =order_id
+        # global NAME; NAME = customer_name
+        # global ORDER_ID; ORDER_ID =order_id
+        request.session['name'] = customer_name
+        request.session['order_id'] = order_id
         if not customer.email:
             customer.email = 'ثبت نشده'
         # if not user.email:
@@ -106,7 +110,7 @@ def zarin_pay(request):
                 'content-type': 'application/json'}
         data = {
             'merchant_id': ZARIN_MERCHANT_ID,
-            # 'amount': int(cart.total_price * 10),
+            # 'amount': int(order.pay) * 10,
             'amount': 1000,
             'description': f'هزینه طراحی برنامه تحت وب',
             'callback_url': CALLBACK_URL,
@@ -148,18 +152,18 @@ def zarin_pay(request):
 def zarin_verify(request):
     """Used in the last step to verify the payment then redirect user to receipt"""
     data = request.GET
-    # cart = request.user.cart.first()
     authority = data['Authority']
-    # cart.authority = data['Authority']
-    # cart.save()
+    # global ORDER_ID
+    # order = Order.objects.get(order_id=ORDER_ID)
+    order = Order.objects.get(order_id=request.session['order_id'])
     # Helper method called
-    response = zarin_pay_verify(request, authority)
-    global ORDER_ID
-    order = Order.objects.get(order_id=ORDER_ID)
+    response = zarin_pay_verify(request, authority, order.pay)
     from core.signals import generate_random_id
     order.authority = authority
     order.peigiry = generate_random_id(6)
-    order.is_paid = True
+    order.remain = order.remain - order.pay
+    if order.remain == 0:
+        order.is_paid = True
     order.save()
     if data['Status'] == 'OK':
         # return JsonResponse(data={'success': 'سفارش شما با موفقیت ثبت شد.'}, safe=False)

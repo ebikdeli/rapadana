@@ -31,6 +31,8 @@ class Order(models.Model):
     authority = models.CharField(verbose_name=_('authority code'), max_length=50, blank=True)
     peigiry = models.CharField(verbose_name=_('peigiry code'), max_length=6, blank=True)
     price = models.DecimalField(verbose_name=_('price'), max_digits=12, decimal_places=0, default=-1)
+    pay = models.DecimalField(verbose_name=_('current payment'), max_digits=12, decimal_places=0, default=-1)
+    remain = models.DecimalField(verbose_name=_('remain price'), max_digits=12, decimal_places=0, default=-1)
     is_paid = models.BooleanField(verbose_name=_('is paid'), default=False)
     start = models.DateField(verbose_name=('project start date'), blank=True, null=True)
     end = models.DateField(verbose_name=_('project end time(est)'), blank=True, null=True)
