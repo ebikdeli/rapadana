@@ -56,6 +56,7 @@ class OrderViewSet(ModelViewSet):
         order_id = request.GET.get('order_id', None)
         # If order requested based on 'cutomer name': #
         if name and not order_id:
+            return Response(data=['ARASH BISHTAR DEGHAT KON AZIZAM', 'Inam araye'])
             order_customer_queryset = Order.objects.filter(customer__name__iexact=name)
             if order_customer_queryset.exists():
                 order_cutomer_serializer = OrderSerializer(order_customer_queryset.all(), many=True, context={'request': request})
@@ -79,6 +80,7 @@ class OrderViewSet(ModelViewSet):
             return Response(data=order_id_serializer.data, status=status.HTTP_200_OK)
         # If order requested based on both 'customer name' and 'order_id': #
         if name and order_id:
+            return Response(data='ARASH BISHTAR DEGHAT KON ZIBAYAM')
             order_queryset = Order.objects.filter(cutomer_name=name, order_id=order_id)
             if order_queryset:
                 order_queryset_serializer = OrderSerializer(order_queryset.first(), many=True, context={'request': request})
