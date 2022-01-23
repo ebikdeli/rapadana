@@ -6,7 +6,7 @@ from rest_framework import status
 from django_filters import rest_framework as filter
 
 from core.models import Customer, Order
-from .serializers import CustomerSerializer, OrderSerializer, UserSerializer, OrderUserSerializer
+from .serializers import CustomerAdminSerializer, OrderAdminSerializer, UserSerializer, OrderUserSerializer
 from .filters import OrderFilterset, CustomerFilterset , UserFilterset
 
 
@@ -27,7 +27,7 @@ class UserViewSet(ModelViewSet):
 class CustomerViewSet(ModelViewSet):
     """Viewset for Customer"""
     queryset = Customer.objects.all()
-    serializer_class = CustomerSerializer
+    serializer_class = CustomerAdminSerializer
     permission_classes = [IsAdminUser, ]
     # permission_classes = [AllowAny, ]
     filter_backends = [filter.DjangoFilterBackend, ]
@@ -40,7 +40,7 @@ class CustomerViewSet(ModelViewSet):
 class OrderViewSet(ModelViewSet):
     """Viewset for Order"""
     queryset = Order.objects.all()
-    serializer_class = OrderSerializer
+    serializer_class = OrderAdminSerializer
     permission_classes = [AllowAny, ]
     filter_backends = [filter.DjangoFilterBackend, ]
     filter_class = OrderFilterset

@@ -1,8 +1,11 @@
 """
     This code writen for ZarinPal pgi, but we can use it for any REST pgi service with minimal changes.
     Note: Using 'global variables' increases the risk of process race between users and expose a user data
-    to other users. In 2 ways we can solve this issue: 1- Using 'session' to save the data needed between
-    multiple views in session based authentication and 2- Use additional headers or variables in token based
+    to other users. So it's not recommmended.
+    It's important to remember we cannot use 'sessions' to pass data between diffrent views
+    because the 'pgi' does not use the same session as user and we can't pass data between 2 diffrent sessions.
+    In 2 ways we can solve this issue: 1- Using 'variables' in the view's 'url' to send unique data (eg:username)
+    to the  2- Use additional headers or variables in token based
     authentication.
 """
 from django.conf import settings
@@ -13,9 +16,9 @@ import requests
 import json
 
 # This is 'heroku' callback url
-CALLBACK_URL = 'https://rapdana.herokuapp.com/api/pay/cart/'
+# CALLBACK_URL = 'https://rapdana.herokuapp.com/api/pay/cart/'
 # This is local callback url
-# CALLBACK_URL = 'http://127.0.0.1:8000/api/pay/cart/'
+CALLBACK_URL = 'http://127.0.0.1:8000/api/pay/cart/'
 if not settings.DEBUG:
     # This is website callback url
     CALLBACK_URL = 'https://www.example/api/pay/cart/'
@@ -67,8 +70,6 @@ def zarin_pay_verify(request, authority, pay):
 def zarin_pay(request):
     """Initialize payment process and redirect user to pgi"""
     # It should get two data from client: 1-'customer name' 2-'order_id'
-    # user = request.user
-    # cart = user.cart.first()
     if request.method == 'GET':
         customer_name = request.GET.get('name', None)
         order_id = request.GET.get('order_id', None)
@@ -105,6 +106,7 @@ def zarin_pay(request):
             customer.phone = 'ثبت نشده'
         # if not user.phone:
             # user.phone = 'ثبت نشده'
+        callback_url = f'{CALLBACK_URL}{order_id}/'
         url = 'https://api.zarinpal.com/pg/v4/payment/request.json'
         headers = {'accept': 'application/json',
                 'content-type': 'application/json'}
@@ -113,7 +115,7 @@ def zarin_pay(request):
             # 'amount': int(order.pay) * 10,
             'amount': 1000,
             'description': f'هزینه طراحی برنامه تحت وب',
-            'callback_url': CALLBACK_URL,
+            'callback_url': callback_url,
             'metadata': {'email': customer.email,
                          'phone': customer.phone}
                 }
@@ -149,13 +151,13 @@ def zarin_pay(request):
         return data
 
 
-def zarin_verify(request):
+def zarin_verify(request, order_id):
     """Used in the last step to verify the payment then redirect user to receipt"""
     data = request.GET
     authority = data['Authority']
     # global ORDER_ID
     # order = Order.objects.get(order_id=ORDER_ID)
-    order = Order.objects.get(order_id=request.session['order_id'])
+    order = Order.objects.get(order_id=order_id)
     # Helper method called
     response = zarin_pay_verify(request, authority, order.pay)
     from core.signals import generate_random_id

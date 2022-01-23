@@ -15,9 +15,10 @@ def count_remain_price(sender, instance, created, **kwargs):
     """Count remain price after creating new Order"""
     if created:
         instance.remain = instance.price
+        instance.save()
     if instance.price and instance.remain < 0:
         instance.remain = instance.price
-    instance.save()
+        instance.save()
 
 
 @receiver(pre_save, sender='core.Order')
