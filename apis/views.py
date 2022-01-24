@@ -14,8 +14,8 @@ class UserViewSet(ModelViewSet):
     """Viewset for User"""
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
-    # permission_classes = [IsAdminUser, ]
-    permission_classes = [AllowAny, ]
+    permission_classes = [IsAdminUser, ]
+    # permission_classes = [AllowAny, ]
     filter_backends = [filter.DjangoFilterBackend, ]
     filter_class = UserFilterset
 
