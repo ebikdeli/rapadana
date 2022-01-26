@@ -65,7 +65,7 @@ class OrderViewSet(ModelViewSet):
                 # order_cutomer_serializer = OrderSerializer(order_customer_queryset.none(), many=True, context={'request': request})
                 # Above command line returns empty list to client. But if we want to return some error directly to client we better use
                 # below line:
-                return Response(data={'error': 'Customer not found'}, status=status.HTTP_204_NO_CONTENT)
+                return Response(data={'error': 'Customer not found'}, status=status.HTTP_200_OK)
             return Response(data=order_cutomer_serializer.data, status=status.HTTP_200_OK)
         # If order requested based on 'order_id': #
         if order_id and not name:
@@ -77,7 +77,7 @@ class OrderViewSet(ModelViewSet):
                 order_id_serializer = OrderSerializer(order_id_queryset.first(), context={'request': request})
             else:
                 # order_id_serializer = OrderSerializer(order_id_queryset.none(), many=True, context={'request': request})
-                return Response(data={'error': 'Order not found'}, status=status.HTTP_204_NO_CONTENT)
+                return Response(data={'error': 'Order not found'}, status=status.HTTP_200_OK)
             # To send better response to client, we better return our sole serializer without any additional information:
             # return Response(data={'order': order_id_serializer.data}, status=status.HTTP_200_OK) <==> below is better:
             return Response(data=order_id_serializer.data, status=status.HTTP_200_OK)
@@ -96,4 +96,4 @@ class OrderViewSet(ModelViewSet):
             return Response(data={'orders': order_serializer.data}, status=status.HTTP_200_OK)
         # If user in not authenticated as admin, Do not return any information from database to user: #
         else:
-            return Response(data={'info': 'No order id or customer name entered'}, status=status.HTTP_204_NO_CONTENT)
+            return Response(data={'info': 'No order id or customer name entered'}, status=status.HTTP_200_OK)
