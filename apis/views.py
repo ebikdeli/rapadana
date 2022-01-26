@@ -62,7 +62,10 @@ class OrderViewSet(ModelViewSet):
             else:
                 # NOTE It is counter inituive but if we dont't set 'many' and 'context' argument for 'QUERYSET OBJECT'
                 # even for a empty query, we will receive AssertionError for 'context' and AttributeError for 'many'. NOTE #
-                order_cutomer_serializer = OrderSerializer(order_customer_queryset.none(), many=True, context={'request': request})
+                # order_cutomer_serializer = OrderSerializer(order_customer_queryset.none(), many=True, context={'request': request})
+                # Above command line returns empty list to client. But if we want to return some error directly to client we better use
+                # below line:
+                return Response(data={'error': 'Customer not found'}, status=status.HTTP_204_NO_CONTENT)
             return Response(data=order_cutomer_serializer.data, status=status.HTTP_200_OK)
         # If order requested based on 'order_id': #
         if order_id and not name:
@@ -73,7 +76,8 @@ class OrderViewSet(ModelViewSet):
                 # single model instance we 'MUST NOT' set 'many=True'. REMEMBER THIS. NOTE #
                 order_id_serializer = OrderSerializer(order_id_queryset.first(), context={'request': request})
             else:
-                order_id_serializer = OrderSerializer(order_id_queryset.none(), many=True, context={'request': request})
+                # order_id_serializer = OrderSerializer(order_id_queryset.none(), many=True, context={'request': request})
+                return Response(data={'error': 'Order not found'}, status=status.HTTP_204_NO_CONTENT)
             # To send better response to client, we better return our sole serializer without any additional information:
             # return Response(data={'order': order_id_serializer.data}, status=status.HTTP_200_OK) <==> below is better:
             return Response(data=order_id_serializer.data, status=status.HTTP_200_OK)
