@@ -14,7 +14,7 @@ from core.models import Customer, Order
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     """Serializer for User model"""
-    url = serializers.HyperlinkedIdentityField(view_name='api:user-detail')
+    url = serializers.HyperlinkedIdentityField(view_name='api:user-detail', lookup_field=get_user_model().USERNAME_FIELD)
 
     class Meta:
         model = get_user_model()
@@ -25,6 +25,12 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 class CustomerAdminSerializer(serializers.HyperlinkedModelSerializer):
     """Serializer for Cutomer model"""
     url = serializers.HyperlinkedIdentityField(view_name='api:customer-detail', lookup_field='name')
+    # For HyperlinkedRelatedField that it's 'viewset' has 'lookup_field' on it, we must set it on the
+    # field just like below field
+    order_set = serializers.HyperlinkedRelatedField(read_only=True,
+                                                    many=True,
+                                                    view_name='api:order-detail',
+                                                    lookup_field='order_id')
 
     class Meta:
         model = Customer
@@ -32,7 +38,6 @@ class CustomerAdminSerializer(serializers.HyperlinkedModelSerializer):
         # to use '__all__ fields, we better exclude EMPTY LIST instead of '__all__' for fields. NOTE #
         # fields = '__all__'
         exclude = []
-        lookup_field = 'name'
 
 
 class CustomerUserSerializer(CustomerAdminSerializer):
@@ -46,12 +51,27 @@ class CustomerUserSerializer(CustomerAdminSerializer):
 class OrderAdminSerializer(serializers.HyperlinkedModelSerializer):
     """"Serializer for Order model"""
     url = serializers.HyperlinkedIdentityField(view_name='api:order-detail', lookup_field='order_id')
+    customer = CustomerAdminSerializer(read_only=True,
+                                       many=False)
+    customer_obj = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all(),
+                                                      many=False,
+                                                      write_only=True,
+                                                      allow_null=True,
+                                                      help_text='This field used for DRF GUI'
+                                                      )
+    customer_name = serializers.CharField(write_only=True,
+                                          allow_null=True,
+                                          help_text='This field used for server-architecture model')
     # Because 'customer' have one to many relation with 'order', we cannot set 'many' attribute to 'True' in below fields or
     # we get this TypeError: "'customer' is not iterable" #
-    customer = CustomerAdminSerializer(many=False, read_only=True)
-    customer_obj = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all(), many=False, write_only=True, allow_null=True)
-    customer_data = CustomerAdminSerializer(write_only=True)
-
+    # customer = CustomerAdminSerializer(many=False, read_only=True)
+    """
+    # Below field better used for the times we want to create a user ontime with creating order
+    customer_data = CustomerAdminSerializer(write_only=True,
+                                            many=False,
+                                            allow_null=True,
+                                            help_text='These fields used for server-architecture model')
+    """
     class Meta:
         model = Order
         # fields = '__all__'
@@ -62,18 +82,40 @@ class OrderAdminSerializer(serializers.HyperlinkedModelSerializer):
         # First we must get 'additational fields' like 'customer_obj' and 'customer_data' data then
         # delete them. 'pop' method is the best way to do this in just one line: #
         customer_obj = validated_data.pop('customer_obj')
-        customer_data = validated_data.pop('customer_data')
+        # customer_data = validated_data.pop('customer_data')
+        customer_name = validated_data.pop('customer_name')
+
         # First check if 'start' is not earlier than 'end' date:
         start = validated_data.get('start', None)
         end = validated_data.get('end', None)
         if start and end:
             if start > end:
                 raise ValidationError(detail={'error': '"end" date could not be earlier than "start" date'}, code=status.HTTP_406_NOT_ACCEPTABLE)
+
         # If we want to create new order pythonic way or from 'DRF interface': #
         if customer_obj:
             validated_data.update({'customer': customer_obj})
             order = Order.objects.create(**validated_data)
             return order
+
+        # If we want to create new user in server-client architectrue
+        if customer_name:
+            queryset = Customer.objects.filter(name=customer_name)
+            if queryset.exists():
+                customer = queryset.last()
+                validated_data.update({'customer': customer})
+                order = Order.objects.create(**validated_data)
+                return order
+            else:
+                raise ValidationError(detail='Error: There is no customer with this name')
+        
+        # IF no customer_obj or customer_name entered raise error:
+        else:
+            raise ValidationError(detail={'Error': 'There is no customer identified'}, code=status.HTTP_400_BAD_REQUEST)
+
+        """
+        We used 'cutomer_name' to see if there is a customer with the entered name. So we don't need 'customer_data'
+        field anymore...
         # To create a new order with any other 'API' technology like react or mobile apps: #
         # Delete all keys in 'customer_data' that their value are 'None'
         for k, v in dict(customer_data).items():
@@ -88,17 +130,21 @@ class OrderAdminSerializer(serializers.HyperlinkedModelSerializer):
             return order
         else:
             raise ValidationError(detail={'error': 'There is no user identified'}, code=status.HTTP_406_NOT_ACCEPTABLE)
+        """
 
     def update(self, instance, validated_data):
         """Update any order"""
         customer_obj = validated_data.pop('customer_obj')
-        customer_data = validated_data.pop('customer_data')
+        # customer_data = validated_data.pop('customer_data')
+        customer_name = validated_data.pop('customer_name')
+
         # Check if 'start' date is not later than 'end' date:
         start = validated_data.get('start', None)
         end = validated_data.get('end', None)
         if start and end:
             if start > end:
                 raise ValidationError(detail={'error': '"end" date could not be earlier than "start" date'}, code=status.HTTP_406_NOT_ACCEPTABLE)
+
         # If we want to update order from DRF interface or pythonic way: #
         if customer_obj:
             instance.customer = customer_obj
@@ -106,8 +152,25 @@ class OrderAdminSerializer(serializers.HyperlinkedModelSerializer):
             # After 'update' method on queryset, following method needed to get refreshed data from db per document:
             # NOTE https://docs.djangoproject.com/en/4.0/ref/models/instances/#refreshing-objects-from-database NOTE #
             instance.refresh_from_db()
-            instance.save()
             return instance
+
+        # If we want to update order with server-client architecture
+        if customer_name:
+            queryset = Customer.objects.filter(name=customer_name)
+            if queryset.exists():
+                customer = queryset.last()
+                validated_data.update({'customer': customer})
+                Order.objects.filter(id=instance.id).update(**validated_data)
+                instance.refresh_from_db()
+                return instance
+            else:
+                raise ValidationError(detail='Error: There is no customer with this name')
+
+        # If not 'customer_obj' selected or 'customer_name' entered raise Validation Error
+        else:
+            raise ValidationError(detail={'Error': 'There is no customer identified'}, code=status.HTTP_400_BAD_REQUEST)
+
+        """
         # To update current order with any other 'API' technology like react or mobile apps: #
         if customer_data:
             # Delete all keys in 'customer_data' that their value are 'None'
@@ -137,7 +200,7 @@ class OrderAdminSerializer(serializers.HyperlinkedModelSerializer):
             Order.objects.filter(instance.id).update(**validated_data)
             instance.refresh_from_db()
             instance.save()
-
+        """
 
 class OrderUserSerializer(OrderAdminSerializer):
     """This Serializer used for ordinary users. It inherit all fields of parent except for 'url' field"""

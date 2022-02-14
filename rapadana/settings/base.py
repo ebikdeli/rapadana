@@ -20,8 +20,8 @@ INSTALLED_APPS = [
     # 'social_django',
 
     'accounts.apps.AccountsConfig',
-    'apis',
-    'core',
+    'apis.apps.ApisConfig',
+    'core.apps.CoreConfig',
 ]
 
 MIDDLEWARE = [

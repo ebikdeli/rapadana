@@ -16,7 +16,7 @@ def count_remain_price(sender, instance, created, **kwargs):
     if created:
         instance.remain = instance.price
         instance.save()
-    if instance.price and instance.remain < 0:
+    if instance.price > -1 and instance.remain < 0:
         instance.remain = instance.price
         instance.save()
 

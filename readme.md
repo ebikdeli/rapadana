@@ -11,3 +11,5 @@ IMPORTANT: We included 'migrations' and 'database' to the git project because of
 We used DRF Validations in Serializers.
 
 Serializer inheritance used in the project for security reasons.
+
+We have used overriding methods in ViewSet for a better structured program.

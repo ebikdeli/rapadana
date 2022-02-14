@@ -18,9 +18,10 @@ class UserViewSet(ModelViewSet):
     # permission_classes = [AllowAny, ]
     filter_backends = [filter.DjangoFilterBackend, ]
     filter_class = UserFilterset
+    lookup_field = get_user_model().USERNAME_FIELD
 
     def list(self, request, *args, **kwargs):
-        serializer = UserSerializer(self.queryset, many=True, context={'request': self.request})
+        serializer = UserSerializer(self.queryset, many=True, context={'request': request})
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
@@ -46,23 +47,30 @@ class OrderViewSet(ModelViewSet):
     filter_class = OrderFilterset
     lookup_field = 'order_id'
 
+    def get_serializer_class(self):
+        """Override get_serilalizer_class to get the right serializer based on 'user' authorization status"""
+        if not self.request.user.is_authenticated:
+            return OrderUserSerializer
+        else:
+           return OrderAdminSerializer
+
     def list(self, request, *args, **kwargs):
         """Overwrite 'list' method of Viewset"""
-        if not request.user.is_authenticated:
-            OrderSerializer = OrderUserSerializer
-        else:
-            OrderSerializer = self.serializer_class
-        name = request.GET.get('name', None)
-        order_id = request.GET.get('order_id', None)
+        Serializer = self.get_serializer_class()
+        # name = request.GET.get('name', None)
+        # order_id = request.GET.get('order_id', None)
+        # This is better and more standard way to receive GET parameter
+        name = self.request.query_params.get('name', None)
+        order_id = request.query_params.get('order_id', None)
         # If order requested based on 'cutomer name': #
         if name and not order_id:
             order_customer_queryset = Order.objects.filter(customer__name__iexact=name)
             if order_customer_queryset.exists():
-                order_cutomer_serializer = OrderSerializer(order_customer_queryset.all(), many=True, context={'request': request})
+                order_cutomer_serializer = Serializer(order_customer_queryset.all(), many=True, context={'request': request})
             else:
                 # NOTE It is counter inituive but if we dont't set 'many' and 'context' argument for 'QUERYSET OBJECT'
                 # even for a empty query, we will receive AssertionError for 'context' and AttributeError for 'many'. NOTE #
-                order_cutomer_serializer = OrderSerializer(order_customer_queryset.none(), many=True, context={'request': request})
+                order_cutomer_serializer = Serializer(order_customer_queryset.none(), many=True, context={'request': request})
                 return Response(data=order_cutomer_serializer.data, status=status.HTTP_204_NO_CONTENT)
                 # Above command line returns empty list to client. But if we want to return some error directly to client we better use
                 # below line:
@@ -71,13 +79,12 @@ class OrderViewSet(ModelViewSet):
         # If order requested based on 'order_id': #
         if order_id and not name:
             order_id_queryset = Order.objects.filter(order_id__iexact=order_id)
-            print(order_id_queryset)
             if order_id_queryset.exists():
                 # NOTE IMPORTANT: Only if we use 'QUERYSET OBJECTS' we should set 'many=True' arguement. For a
                 # single model instance we 'MUST NOT' set 'many=True'. REMEMBER THIS. NOTE #
-                order_id_serializer = OrderSerializer(order_id_queryset.first(), context={'request': request})
+                order_id_serializer = Serializer(order_id_queryset.first(), context={'request': request})
             else:
-                order_id_serializer = OrderSerializer(order_id_queryset.none(), many=True, context={'request': request})
+                order_id_serializer = Serializer(order_id_queryset.none(), many=True, context={'request': request})
                 return Response(data=order_id_serializer.data, status=status.HTTP_204_NO_CONTENT)
                 # return Response(data={'error': 'Order not found'}, status=status.HTTP_200_OK)
             # To send better response to client, we better return our sole serializer without any additional information:
@@ -87,14 +94,14 @@ class OrderViewSet(ModelViewSet):
         if name and order_id:
             order_queryset = Order.objects.filter(cutomer_name=name, order_id=order_id)
             if order_queryset:
-                order_queryset_serializer = OrderSerializer(order_queryset.first(), many=True, context={'request': request})
+                order_queryset_serializer = Serializer(order_queryset.first(), many=True, context={'request': request})
             else:
-                order_queryset_serializer = OrderSerializer(order_queryset.none(), many=True, context={'request': request})
+                order_queryset_serializer = Serializer(order_queryset.none(), many=True, context={'request': request})
             return Response(data=order_queryset_serializer.data, status=status.HTTP_200_OK)
         # Or if user is admin show all orders to admin: #
         if self.request.user.is_authenticated:
             orders = Order.objects.all()
-            order_serializer = OrderSerializer(orders, many=True, context={'request': request})
+            order_serializer = Serializer(orders, many=True, context={'request': request})
             return Response(data={'orders': order_serializer.data}, status=status.HTTP_200_OK)
         # If user in not authenticated as admin, Do not return any information from database to user: #
         else:
