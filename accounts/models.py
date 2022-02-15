@@ -30,12 +30,11 @@ class User(AbstractUser):
                              validators=[MaxLengthValidator(13, _('phone number is too long')),
                                          MinLengthValidator(11, _('phone number length is too short'))],
                              blank=True,
-                             null=True
                             )
     name = models.CharField(verbose_name=_('user name'),
                             max_length=50,
-                            blank=True,
-                            null=True)
+                            blank=True
+                        )
     address = models.TextField(verbose_name=_('address'), blank=True)
     picture = models.ImageField(verbose_name=_('user picture'), blank=True)
     background = models.ImageField(verbose_name=_('profile background'), blank=True)
