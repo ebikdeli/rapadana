@@ -3,6 +3,10 @@ To show or use some fields to admin without showing them to users, we can have t
 implement needed logic in each Serializers or in the 'view'. It might needs more time and be a tedious
 job but it would be more secure and is more managable and straithforward.
 https://www.django-rest-framework.org/api-guide/serializers/#serializer-inheritance
+
+To show only some fields to client, we can use dynamic fields. This method requires little work but can be
+very useful. Read below document for more information:
+https://www.django-rest-framework.org/api-guide/serializers/#dynamically-modifying-fields
 """
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -77,6 +81,11 @@ class OrderAdminSerializer(serializers.HyperlinkedModelSerializer):
         # fields = '__all__'
         exclude = []
     
+    def __init__(self, instance=None, *args, **kwargs):
+        """We can override this method to support for dynamically modifying fields."""
+        print(kwargs)
+        super().__init__(instance, *args, **kwargs)
+
     def create(self, validated_data):
         """'validated_data' is a dictionary consists of the data sent from client to serializer"""
         # First we must get 'additational fields' like 'customer_obj' and 'customer_data' data then
