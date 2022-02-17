@@ -76,9 +76,9 @@ class OrderViewSet(ModelViewSet):
 
         # If order requested based on 'cutomer name': #
         if name and not order_id:
-            order_customer_queryset = self.get_queryset().filter(customer__name__iexact=name)
+            order_customer_queryset = self.get_queryset().filter(customer__name__iexact=name)[:1]
             if order_customer_queryset.exists():
-                order_cutomer_serializer = Serializer(order_customer_queryset.last(), many=True, context={'request': request})
+                order_cutomer_serializer = Serializer(order_customer_queryset, many=True, context={'request': request})
             else:
                 # NOTE It is counter inituive but if we dont't set 'many' and 'context' argument for 'QUERYSET OBJECT'
                 # even for a empty query, we will receive AssertionError for 'context' and AttributeError for 'many'. NOTE #
