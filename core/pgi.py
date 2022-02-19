@@ -40,7 +40,7 @@ def zarin_response_code(request, zarin_response):
     elif code == -34:
         error =  'مبلغ وارد شده از تراکنش بیشتر است'
     elif code == -51:
-        error = 'پرداخت ناموفق'
+        error = 'پرداخت ناموفق. از پرداخت منصرف شده اید'
     elif code == -53:
         error = 'کد اتوریتی نامعتبر است'
     return f'code={code}, {error}'
