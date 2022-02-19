@@ -175,7 +175,7 @@ def zarin_verify(request, order_id):
         return data
     if data['Status'] == 'NOK':
         # return JsonResponse(data={'error': 'پرداخت انجام نگرفت و سفارشی ثبت نگردید'}, safe=False)
-        data={'success': 'پرداخت انجام گرفت اما تاییدیه صادر نشد'}
+        data={'message': 'پرداخت انجام گرفت اما تاییدیه صادر نشد'}
         data.update(response)
         print(data)
         return data
