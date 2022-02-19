@@ -43,7 +43,7 @@ def zarin_response_code(request, zarin_response):
         error = 'پرداخت ناموفق'
     elif code == -53:
         error = 'کد اتوریتی نامعتبر است'
-    return error
+    return f'code={code}, {error}'
 
 
 def zarin_pay_verify(request, authority, pay):
