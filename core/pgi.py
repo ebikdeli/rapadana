@@ -1,12 +1,15 @@
 """
-    This code writen for ZarinPal pgi, but we can use it for any REST pgi service with minimal changes.
-    Note: Using 'global variables' increases the risk of process race between users and expose a user data
-    to other users. So it's not recommmended.
-    It's important to remember we cannot use 'sessions' to pass data between diffrent views
-    because the 'pgi' does not use the same session as user and we can't pass data between 2 diffrent sessions.
-    In 2 ways we can solve this issue: 1- Using 'variables' in the view's 'url' to send unique data (eg:username)
-    to the  2- Use additional headers or variables in token based
-    authentication.
+** Because HTTP HEADERS do not accept 'non-ascii' characters, we define equall 'ascii' response for every 'non-ascii'
+'non-ascii' response! Look at 'error' data in this module.
+
+** This code writen for ZarinPal pgi, but we can use it for any REST pgi service with minimal changes.
+Note: Using 'global variables' increases the risk of process race between users and expose a user data
+to other users. So it's not recommmended.
+It's important to remember we cannot use 'sessions' to pass data between diffrent views
+because the 'pgi' does not use the same session as user and we can't pass data between 2 diffrent sessions.
+In 2 ways we can solve this issue: 1- Using 'variables' in the view's 'url' to send unique data (eg:username)
+to the  2- Use additional headers or variables in token based
+authentication.
 """
 from django.conf import settings
 
@@ -16,12 +19,16 @@ import requests
 import json
 
 # This is 'heroku' callback url
-CALLBACK_URL = 'https://rapdana.herokuapp.com/api/pay/cart/'
+# CALLBACK_URL = 'https://rapdana.herokuapp.com/api/pay/cart/'
 # This is local callback url
 # CALLBACK_URL = 'http://127.0.0.1:8000/api/pay/cart/'
 if not settings.DEBUG:
     # This is website callback url
     CALLBACK_URL = 'https://www.example/api/pay/cart/'
+
+# BUT THE BEST WAY IS TO USE request.build_absolute_uri(location) method
+LOCATION = 'api/pay/cart/'
+
 ZARIN_MERCHANT_ID = 'b46922ec-f436-402b-a553-4107451475cc'
 
 NAME = ''
@@ -32,17 +39,23 @@ def zarin_response_code(request, zarin_response):
     """Helper function to decode if any error messages in payment process"""
     code = zarin_response['errors']['code']
     if code == -9:
-        error = 'موجودی باید بیش از 1000 ریال بشد'
+        # error = 'موجودی باید بیش از 1000 ریال بشد'
+        error = 'Less than 1000 Rials in your account'
     elif code == -10:
-        error = 'آدرس آی پی یا مرچنت کد پذیرنده صحیح نیست'
+        # error = 'آدرس آی پی یا مرچنت کد پذیرنده صحیح نیست'
+        error = 'IP address or Merchant code of Accepter is not valid'
     elif code == -12:
-        error = 'تلاش بیش از اندازه در یک بازه زمانی کوتاه. بعدا تلاش کنید'
+        # error = 'تلاش بیش از اندازه در یک بازه زمانی کوتاه. بعدا تلاش کنید'
+        error = 'Too many request in short time period. Try later'
     elif code == -34:
-        error =  'مبلغ وارد شده از تراکنش بیشتر است'
+        # error =  'مبلغ وارد شده از تراکنش بیشتر است'
+        error = 'Input money is more than transaction'
     elif code == -51:
-        error = 'پرداخت ناموفق. از پرداخت منصرف شده اید'
+        # error = 'پرداخت ناموفق. از پرداخت منصرف شده اید'
+        error = 'You Have cancelled the payment'
     elif code == -53:
-        error = 'کد اتوریتی نامعتبر است'
+        # error = 'کد اتوریتی نامعتبر است'
+        error = 'Authority code is invalid'
     return {'code': code, 'error': error}
 
 
@@ -61,7 +74,8 @@ def zarin_pay_verify(request, authority, pay):
     if r.status_code == 200 or 201:
         zarin_response = r.json()
         if zarin_response['data']:
-            return {'verify': f'تاییدیه تراکنش شما: {authority}'}
+            # return {'verify': f'تاییدیه تراکنش شما: {authority}'}
+            return {'verify': f'User Authority code: {authority}'}
         else:
             error = zarin_response_code(request, zarin_response)
             return error
@@ -122,6 +136,12 @@ def zarin_pay(request):
         customer.phone = 'ثبت نشده'
     # if not user.phone:
         # user.phone = 'ثبت نشده'
+
+    # This is better and more generic way to build CALLBACK_URL THIS WAY:
+    # https://docs.djangoproject.com/en/4.0/ref/request-response/#django.http.HttpRequest.get_host
+    CALLBACK_URL = f'{request.scheme}://{request.get_host()}/{LOCATION}'
+    # CALLBACK_URL = request.build_absolute_uri('api/pay/cart/')
+    # print(CALLBACK_URL)
     callback_url = f'{CALLBACK_URL}{order_id}/'
     url = 'https://api.zarinpal.com/pg/v4/payment/request.json'
     headers = {'accept': 'application/json',
@@ -139,7 +159,8 @@ def zarin_pay(request):
         r = requests.post(url=url, data=json.dumps(data), headers=headers)
     except requests.ConnectionError:
         # return JsonResponse(data={'برقراری با ارتباط با واسط پرداخت به مشکل برخورده'}, safe=True)
-        data={'برقراری با ارتباط با واسط پرداخت به مشکل برخورده'}
+        # data={'برقراری با ارتباط با واسط پرداخت به مشکل برخورده'}
+        data={'Error in connection to gateway provider'}
         return data
     if r.status_code == 200 or 201:
         zarin_response = r.json()
@@ -159,7 +180,8 @@ def zarin_pay(request):
             return data
     else:
         # return JsonResponse(data={'error': 'ارتباط با سایت پذیرنده ممکن نمی باشد'}, safe=False)
-        data={'error': 'ارتباط با سایت پذیرنده ممکن نمی باشد'}
+        # data={'error': 'ارتباط با سایت پذیرنده ممکن نمی باشد'}
+        data={'error': 'Connection could not made with payment provider'}
         return data
 
 
@@ -175,14 +197,16 @@ def zarin_verify(request, order_id):
 
     if data['Status'] == 'OK':
         # return JsonResponse(data={'success': 'سفارش شما با موفقیت ثبت شد.'}, safe=False)
-        result = {'success': 'سفارش شما با موفقیت ثبت شد.'}
+        # result = {'success': 'سفارش شما با موفقیت ثبت شد.'}
+        result = {'success': 'Payment was successful. Everything is okay'}
         result.update(response)
-        print(result)
+        result.update({'status': 'OK'})
     elif data['Status'] == 'NOK':
         # return JsonResponse(data={'error': 'پرداخت انجام نگرفت و سفارشی ثبت نگردید'}, safe=False)
-        result = {'message': 'پرداخت انجام گرفت اما تاییدیه صادر نشد'}
+        # result = {'message': 'پرداخت انجام گرفت اما تاییدیه صادر نشد'}
+        result = {'message': 'Payment was unseccessful'}
         result.update(response)
-        print(result)
+        result.update({'status': 'NOK'})
         return result
 
     from core.signals import generate_random_id
