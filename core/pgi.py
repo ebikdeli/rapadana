@@ -22,11 +22,12 @@ import json
 # CALLBACK_URL = 'https://rapdana.herokuapp.com/api/pay/cart/'
 # This is local callback url
 # CALLBACK_URL = 'http://127.0.0.1:8000/api/pay/cart/'
-if not settings.DEBUG:
-    # This is website callback url
-    CALLBACK_URL = 'https://www.example/api/pay/cart/'
+# if not settings.DEBUG:
+#     # This is website callback url
+#     CALLBACK_URL = 'https://www.example/api/pay/cart/'
 
-# BUT THE BEST WAY IS TO USE request.build_absolute_uri(location) method
+# BUT THE BEST WAY IS TO USE request.build_absolute_uri(location) method because we don't need to worry about
+# the name of protocol and domain name:
 LOCATION = 'api/pay/cart/'
 
 ZARIN_MERCHANT_ID = 'b46922ec-f436-402b-a553-4107451475cc'
