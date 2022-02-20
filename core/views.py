@@ -4,13 +4,13 @@ authenticate user session. To do that we need to get 'csrftoken' cookie we can
 """
 from django.shortcuts import redirect
 from django.http import JsonResponse
-# from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
 
 from .pgi import zarin_pay, zarin_verify
 
 
 # @login_required
-# @csrf_exempt
+@csrf_exempt
 def pay(request):
     """First step of payment. This view redirect user to pgi to enter his/her ID cart"""
     # This is the url we begin our payment proccedure. We need two arguments to begin payment:
@@ -21,7 +21,7 @@ def pay(request):
     return JsonResponse(data=data, safe=False)
 
 
-# @csrf_exempt
+@csrf_exempt
 def cart_pay(request, order_id=None):
     """It's the second step towards payment. After payment we should verify if payment was a success or not"""
     data = zarin_verify(request, order_id)
