@@ -73,81 +73,85 @@ def zarin_pay(request):
     if request.method == 'GET':
         customer_name = request.GET.get('name', None)
         order_id = request.GET.get('order_id', None)
-        if not customer_name:
-            # return JsonResponse(data={'request error': 'No customer name received'}, safe=False)
-            data={'error': 'No customer name received'}
-            return data
-        if not order_id:
-            # return JsonResponse(data={'request error': 'No order_id received'}, safe=False)
-            data={'error': 'No order_id received'}
-            return data
-        # customer = Customer.objects.filter(name__icontain=customer_name)
-        customer = Customer.objects.filter(name__iexact=customer_name)
-        if not customer.exists():
-            # return JsonResponse(data={'error': 'There is no customer with the requested name'}, safe=False)
-            data={'error': 'There is no customer with the requested name'}
-            return data
-        order = Order.objects.filter(order_id=order_id)
-        if not order.exists():
-            # return JsonResponse(data={'error': 'There is no order registered with requested id'}, safe=False)
-            data={'error': 'There is no order registered with requested id'}
-            return data
-        customer = customer.first()
-        order = order.first()
-        # global NAME; NAME = customer_name
-        # global ORDER_ID; ORDER_ID =order_id
-        request.session['name'] = customer_name
-        request.session['order_id'] = order_id
-        if not customer.email:
-            customer.email = 'ثبت نشده'
-        # if not user.email:
-            # user.email = 'ثبت نشده'
-        if not customer.phone:
-            customer.phone = 'ثبت نشده'
-        # if not user.phone:
-            # user.phone = 'ثبت نشده'
-        callback_url = f'{CALLBACK_URL}{order_id}/'
-        url = 'https://api.zarinpal.com/pg/v4/payment/request.json'
-        headers = {'accept': 'application/json',
-                'content-type': 'application/json'}
-        data = {
-            'merchant_id': ZARIN_MERCHANT_ID,
-            # 'amount': int(order.pay) * 10,
-            'amount': 1000,
-            'description': f'هزینه طراحی برنامه تحت وب',
-            'callback_url': callback_url,
-            'metadata': {'email': customer.email,
-                         'phone': customer.phone}
-                }
-        try:
-            r = requests.post(url=url, data=json.dumps(data), headers=headers)
-        except requests.ConnectionError:
-            # return JsonResponse(data={'برقراری با ارتباط با واسط پرداخت به مشکل برخورده'}, safe=True)
-            data={'برقراری با ارتباط با واسط پرداخت به مشکل برخورده'}
-            return data
-        if r.status_code == 200 or 201:
-            zarin_response = r.json()
-            # If request was a success:
-            if zarin_response['data']:
-                authority = zarin_response['data']['authority']
-                new_url = f'https://www.zarinpal.com/pg/StartPay/{authority}'
-                # Redirect user to PGI to pay
-                # return JsonResponse(data={'url': new_url})
-                data={'url': new_url}
-                return data
-            # If there is a error:
-            else:
-                error = zarin_response_code(request, zarin_response)
-                # return JsonResponse(data={'error': error})
-                data={'error': error}
-                return data
-        else:
-            # return JsonResponse(data={'error': 'ارتباط با سایت پذیرنده ممکن نمی باشد'}, safe=False)
-            data={'error': 'ارتباط با سایت پذیرنده ممکن نمی باشد'}
-            return data
+    elif request.method == 'POST':
+        customer_name = request.POST.get('name', None)
+        order_id = request.POST.get('order_id', None)
     else:
         # return JsonResponse(data={'error': 'only "GET" method could be used'}, safe=False)
-        data={'error': 'only "GET" method could be used'}
+        data={'error': 'only "GET" and "POST" methods could be used'}
+        return data
+
+    if not customer_name:
+        # return JsonResponse(data={'request error': 'No customer name received'}, safe=False)
+        data={'error': 'No customer name received'}
+        return data
+    if not order_id:
+        # return JsonResponse(data={'request error': 'No order_id received'}, safe=False)
+        data={'error': 'No order_id received'}
+        return data
+    # customer = Customer.objects.filter(name__icontain=customer_name)
+    customer = Customer.objects.filter(name__iexact=customer_name)
+    if not customer.exists():
+        # return JsonResponse(data={'error': 'There is no customer with the requested name'}, safe=False)
+        data={'error': 'There is no customer with the requested name'}
+        return data
+    order = Order.objects.filter(order_id=order_id)
+    if not order.exists():
+        # return JsonResponse(data={'error': 'There is no order registered with requested id'}, safe=False)
+        data={'error': 'There is no order registered with requested id'}
+        return data
+    customer = customer.first()
+    order = order.first()
+    # global NAME; NAME = customer_name
+    # global ORDER_ID; ORDER_ID =order_id
+    request.session['name'] = customer_name
+    request.session['order_id'] = order_id
+    if not customer.email:
+        customer.email = 'ثبت نشده'
+    # if not user.email:
+        # user.email = 'ثبت نشده'
+    if not customer.phone:
+        customer.phone = 'ثبت نشده'
+    # if not user.phone:
+        # user.phone = 'ثبت نشده'
+    callback_url = f'{CALLBACK_URL}{order_id}/'
+    url = 'https://api.zarinpal.com/pg/v4/payment/request.json'
+    headers = {'accept': 'application/json',
+            'content-type': 'application/json'}
+    data = {
+        'merchant_id': ZARIN_MERCHANT_ID,
+        # 'amount': int(order.pay) * 10,
+        'amount': 1000,
+        'description': f'هزینه طراحی برنامه تحت وب',
+        'callback_url': callback_url,
+        'metadata': {'email': customer.email,
+                     'phone': customer.phone}
+                    }
+    try:
+        r = requests.post(url=url, data=json.dumps(data), headers=headers)
+    except requests.ConnectionError:
+        # return JsonResponse(data={'برقراری با ارتباط با واسط پرداخت به مشکل برخورده'}, safe=True)
+        data={'برقراری با ارتباط با واسط پرداخت به مشکل برخورده'}
+        return data
+    if r.status_code == 200 or 201:
+        zarin_response = r.json()
+        # If request was a success:
+        if zarin_response['data']:
+            authority = zarin_response['data']['authority']
+            new_url = f'https://www.zarinpal.com/pg/StartPay/{authority}'
+            # Redirect user to PGI to pay
+            # return JsonResponse(data={'url': new_url})
+            data={'url': new_url}
+            return data
+        # If there is a error:
+        else:
+            error = zarin_response_code(request, zarin_response)
+            # return JsonResponse(data={'error': error})
+            data={'error': error}
+            return data
+    else:
+        # return JsonResponse(data={'error': 'ارتباط با سایت پذیرنده ممکن نمی باشد'}, safe=False)
+        data={'error': 'ارتباط با سایت پذیرنده ممکن نمی باشد'}
         return data
 
 
