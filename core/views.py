@@ -1,6 +1,10 @@
 """
 When using SessionBased authentication, any request method other than 'get' we need 'csrf token' to
-authenticate user session. To do that we need to get 'csrftoken' cookie we can
+authenticate user session. To do that we need to get 'csrftoken' cookie value (We can get this cookie
+in browser -> Network(tab) -> Request(tab) -> Headers -> Cookies -> csrftoken) and send it in the
+request header as 'X-CSRFToken' header. Read documents below for more information:
+https://www.django-rest-framework.org/topics/ajax-csrf-cors/#csrf-protection
+https://docs.djangoproject.com/en/4.0/ref/csrf/#setting-the-token-on-the-ajax-request
 """
 from django.shortcuts import redirect
 from django.http import JsonResponse

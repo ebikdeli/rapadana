@@ -74,8 +74,16 @@ def zarin_pay(request):
         customer_name = request.GET.get('name', None)
         order_id = request.GET.get('order_id', None)
     elif request.method == 'POST':
+        qs = request.META.get('QUERY_STRING', None)
         customer_name = request.POST.get('name', None)
         order_id = request.POST.get('order_id', None)
+        if not customer_name and not order_id and qs:
+            try:
+                customer_name_value, order_id_value = qs.split('&')
+                customer_name = customer_name_value.split('=')[1]
+                order_id = order_id_value.split('=')[1]
+            except (ValueError, IndexError):
+                return {'error': 'Parameter entered are wrong!'}
     else:
         # return JsonResponse(data={'error': 'only "GET" method could be used'}, safe=False)
         data={'error': 'only "GET" and "POST" methods could be used'}
