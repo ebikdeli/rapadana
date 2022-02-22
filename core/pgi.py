@@ -55,7 +55,8 @@ def zarin_response_code(request, zarin_response):
         error =  'مبلغ وارد شده از تراکنش بیشتر است'
         # error = 'Input money is more than transaction'
     elif code == -51:
-        error = 'پرداخت ناموفق. از پرداخت منصرف شده اید'
+        error = 'انصراف از پرداخت'
+        # error = 'پرداخت ناموفق. از پرداخت منصرف شده اید'
         # error = 'You Have cancelled the payment'
     elif code == -53:
         error = 'کد اتوریتی نامعتبر است'

@@ -49,7 +49,11 @@ def cart_pay(request, order_id=None):
         order = Order.objects.get(order_id=order_id)
         customer = order.customer
         data.update({'order': order, 'customer': customer})
-    return render(request, template_name='core/templates/payment_result.html', context=data)
+        template = 'core/templates/payment_ok.html'
+    else:
+        template = 'core/templates/payment_failed.html'
+
+    return render(request, template_name=template, context=data)
 
     # All commands below are just for clinet-server architecture #
     # url_redirect_to = 'https://react-test-eosin.vercel.app/'
