@@ -1,4 +1,7 @@
 """
+** I think in client-server architecture it is better to let client to handle payment procedure but for now Arash does
+not have the expertise to do that.
+
 ** Because HTTP HEADERS do not accept 'non-ascii' characters, we define equall 'ascii' response for every 'non-ascii'
 'non-ascii' response! Look at 'error' data in this module.
 
@@ -13,7 +16,7 @@ authentication.
 """
 from django.conf import settings
 
-from .models import Customer, Order
+from .models import Customer, Order, Payment
 
 import requests
 import json
@@ -40,23 +43,23 @@ def zarin_response_code(request, zarin_response):
     """Helper function to decode if any error messages in payment process"""
     code = zarin_response['errors']['code']
     if code == -9:
-        # error = 'موجودی باید بیش از 1000 ریال بشد'
-        error = 'Less than 1000 Rials in your account'
+        error = 'موجودی باید بیش از 1000 ریال بشد'
+        # error = 'Less than 1000 Rials in your account'
     elif code == -10:
-        # error = 'آدرس آی پی یا مرچنت کد پذیرنده صحیح نیست'
-        error = 'IP address or Merchant code of Accepter is not valid'
+        error = 'آدرس آی پی یا مرچنت کد پذیرنده صحیح نیست'
+        # error = 'IP address or Merchant code of Accepter is not valid'
     elif code == -12:
-        # error = 'تلاش بیش از اندازه در یک بازه زمانی کوتاه. بعدا تلاش کنید'
-        error = 'Too many request in short time period. Try later'
+        error = 'تلاش بیش از اندازه در یک بازه زمانی کوتاه. بعدا تلاش کنید'
+        # error = 'Too many request in short time period. Try later'
     elif code == -34:
-        # error =  'مبلغ وارد شده از تراکنش بیشتر است'
-        error = 'Input money is more than transaction'
+        error =  'مبلغ وارد شده از تراکنش بیشتر است'
+        # error = 'Input money is more than transaction'
     elif code == -51:
-        # error = 'پرداخت ناموفق. از پرداخت منصرف شده اید'
-        error = 'You Have cancelled the payment'
+        error = 'پرداخت ناموفق. از پرداخت منصرف شده اید'
+        # error = 'You Have cancelled the payment'
     elif code == -53:
-        # error = 'کد اتوریتی نامعتبر است'
-        error = 'Authority code is invalid'
+        error = 'کد اتوریتی نامعتبر است'
+        # error = 'Authority code is invalid'
     return {'code': code, 'error': error}
 
 
@@ -75,8 +78,8 @@ def zarin_pay_verify(request, authority, pay):
     if r.status_code == 200 or 201:
         zarin_response = r.json()
         if zarin_response['data']:
-            # return {'verify': f'تاییدیه تراکنش شما: {authority}'}
-            return {'verify': f'User Authority code: {authority}'}
+            return {'verify': f'تاییدیه تراکنش شما: {authority}'}
+            # return {'verify': f'User Authority code: {authority}'}
         else:
             error = zarin_response_code(request, zarin_response)
             return error
@@ -160,8 +163,8 @@ def zarin_pay(request):
         r = requests.post(url=url, data=json.dumps(data), headers=headers)
     except requests.ConnectionError:
         # return JsonResponse(data={'برقراری با ارتباط با واسط پرداخت به مشکل برخورده'}, safe=True)
-        # data={'برقراری با ارتباط با واسط پرداخت به مشکل برخورده'}
-        data={'Error in connection to gateway provider'}
+        data={'برقراری با ارتباط با واسط پرداخت به مشکل برخورده'}
+        # data={'Error in connection to gateway provider'}
         return data
     if r.status_code == 200 or 201:
         zarin_response = r.json()
@@ -181,8 +184,8 @@ def zarin_pay(request):
             return data
     else:
         # return JsonResponse(data={'error': 'ارتباط با سایت پذیرنده ممکن نمی باشد'}, safe=False)
-        # data={'error': 'ارتباط با سایت پذیرنده ممکن نمی باشد'}
-        data={'error': 'Connection could not made with payment provider'}
+        data={'error': 'ارتباط با سایت پذیرنده ممکن نمی باشد'}
+        # data={'error': 'Connection could not made with payment provider'}
         return data
 
 
@@ -198,25 +201,26 @@ def zarin_verify(request, order_id):
 
     if data['Status'] == 'OK':
         # return JsonResponse(data={'success': 'سفارش شما با موفقیت ثبت شد.'}, safe=False)
-        # result = {'success': 'سفارش شما با موفقیت ثبت شد.'}
-        result = {'success': 'Payment was successful. Everything is okay'}
+        result = {'success': 'سفارش شما با موفقیت ثبت شد.'}
+        # result = {'success': 'Payment was successful. Everything is okay'}
         result.update(response)
         result.update({'status': 'OK'})
     elif data['Status'] == 'NOK':
         # return JsonResponse(data={'error': 'پرداخت انجام نگرفت و سفارشی ثبت نگردید'}, safe=False)
-        # result = {'message': 'پرداخت انجام گرفت اما تاییدیه صادر نشد'}
-        result = {'message': 'Payment was unseccessful'}
+        result = {'message': 'مشکلی در عملیات پرداخت پیش آمده'}
+        # result = {'message': 'Payment was unseccessful'}
         result.update(response)
         result.update({'status': 'NOK'})
         return result
 
     from core.signals import generate_random_id
-    order.authority = authority
-    order.peigiry = generate_random_id(6)
     order.remain = order.remain - order.pay
     if order.remain == 0:
         order.is_paid = True
     order.save()
+    perigiry = generate_random_id(6)
+    order.payments.create(amount=order.pay, authority=authority, peigiry=perigiry)
+    # Or this: Payment.objects.create(order=order, amount=order.pay, authority=authority, peigiry=perigiry)
     return result
 
 

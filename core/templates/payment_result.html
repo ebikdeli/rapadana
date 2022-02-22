@@ -1,0 +1,166 @@
+{% extends 'core/templates/base.html' %}
+
+{% block title %}رسید مشتری{% endblock %}
+
+{% comment "header" %}
+{% block header %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+          <a class="nav-item nav-link active" href="{% url 'vitrin:index' %}">صفحه اصلی <span class="sr-only">(current)</span></a>
+          <!--frist page link-->
+        </div>
+      </div>
+    <a class="nav-item nav-link active" href="{% url 'cart:show_cart' %}">سبد خرید <span uk-icon="icon: cart;"></span></a>
+    </nav>
+{% endblock header %}
+{% endcomment %}
+
+{% block content %}
+<div class="container">
+      <div class="row">
+        <div class="col-xl-12 BOX">
+
+          <!-- This is where table that shows customer and payment data if successfully paid-->
+          {% if status == 'OK' %}
+          <div class="col-md-6">
+            <table class="uk-table uk-table-small uk-table-divider">
+              <thead>
+                <tr>
+                  <th>اطلاعات سفارش دهنده</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>نام </td>
+                  <td>
+                    {{customer.name}}
+                    <!--Customer name-->
+                  </td>
+                </tr>
+
+                {% if customer.email %}
+                <tr>
+                  <td>ایمیل</td>
+                  <td>
+                      {{ customer.email }}
+                    <!-- customer email-->
+                  </td>
+                </tr>
+                {% endif %}
+                {% if customer.phone %}
+                <tr>
+                  <td>شماره تماس</td>
+                  <td>
+                      {{ customer.phone }}
+                    <!-- customer phone-->
+                  </td>
+                </tr>
+                {% endif %}
+                {% if customer.address %}
+                <tr>
+                  <td>آدرس</td>
+                  <td>
+                      {{ customer.address }}
+                    <!-- customer address-->
+                  </td>
+                </tr>
+                {% endif %}
+
+                <tr>
+                  <td>مبلغ پرداخت شده (تومان)</td>
+                  <td>
+                      {{ order.pay }}
+                    <!--price paid-->
+                  </td>
+                </tr>
+                {% if order.remain %}
+                <tr>
+                  <td>مبلغ باقی مانده (تومان)</td>
+                  <td>
+                      {{ order.remain }}
+                    <!--price remain-->
+                  </td>
+                </tr>
+                {% endif %}
+                <!--
+                <tr>
+                  <td>شماره ارجاع</td>
+                  <td>
+
+                  </td>
+                </tr>
+                -->
+                <tr>
+                  <td>شماره سفارش</td>
+                  <td>
+                      {{ order.order_id }}
+
+                  </td>
+                </tr>
+                <!--
+                <tr>
+                  <td>شماره پیگیری</td>
+                  <td>
+
+                  </td>
+                </tr>
+                -->
+                <tr>
+                  <td>زمان و تاریخ ثبت سفارش</td>
+                  <td>
+                      {{ order.created|date:"d/m/Y - G:i" }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <div class="col-md-10 box">
+              <input type="radio" id="control_01" name="select" checked />
+              <label for="control_01">
+                <p>پرداخت موفق</p>
+
+                {% comment %}
+                <p>
+                    {{ order.option }}
+                  <!-- Project name -->
+                </p>
+                {% endcomment %}
+
+                <hr />
+                <p>
+                    کل مبلغ پرداخت شده: {{ order.pay }} تومان
+                  <!-- Type of service -->
+                </p>
+              </label>
+            </div>
+            <div id="print-button">
+              <button class="print-button" id="noPrint" onclick="window.print();"><span class="print-icon"></span></button>
+            </div>
+            <p class="error"><!-- error messages --></p>
+          </div>
+
+          <!--If payment was not successful-->
+          {% else %}
+          <div class="col-md-6">
+            <div class="col-md-10 box">
+              <input type="radio" id="control_01" name="select" checked />
+              <label for="control_01">
+                <p>پرداخت ناموفق </p>
+                <p>{{ error }}</p>
+              </label>
+            </div>
+          </div>
+          {% endif %}
+          <h3><a href="https://react-test-eosin.vercel.app/" class="btn btn-outline-primary">بازگشت به صفحه اصلی فروشگاه</a></h3>
+        </div>
+      </div>
+    </div>
+    <br />
+    <br />
+    <br />
+{% endblock content %}

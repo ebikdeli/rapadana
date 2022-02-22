@@ -36,8 +36,6 @@ class Order(models.Model):
                                                   null=True)
     content = models.TextField(verbose_name=_('contents'), blank=True, null=True)
     order_id = models.CharField(verbose_name=_('order id'), max_length=10, blank=True)
-    authority = models.CharField(verbose_name=_('authority code'), max_length=50, blank=True)
-    peigiry = models.CharField(verbose_name=_('peigiry code'), max_length=6, blank=True)
     price = models.DecimalField(verbose_name=_('price'), max_digits=12, decimal_places=0, default=-1)
     pay = models.DecimalField(verbose_name=_('current payment'), max_digits=12, decimal_places=0, default=-1)
     remain = models.DecimalField(verbose_name=_('remain price'), max_digits=12, decimal_places=0, default=-1)
@@ -54,3 +52,15 @@ class Order(models.Model):
         if self.customer.name:
             return 'order(' + str(self.id) + '): ' + self.customer.name
         return 'order(' + str(self.id) + ')'
+
+
+class Payment(models.Model):
+    """Every time a customer pay for something this model created"""
+    order = models.ForeignKey('Order', related_name='payments', on_delete=models.CASCADE)
+    amount = models.DecimalField(verbose_name=_('amount'), max_digits=12, decimal_places=0, default=-1)
+    authority = models.CharField(verbose_name=_('authority code'), max_length=50, blank=True)
+    peigiry = models.CharField(verbose_name=_('peigiry code'), max_length=6, blank=True)
+    time = models.DateTimeField(verbose_name=_('time'), auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f'order({self.order.id})_payment({self.id})'

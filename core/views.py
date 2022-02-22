@@ -2,6 +2,7 @@
 ** In client-server architecture, to send arbitrary data to some client without the client asking for any
 api then redirect users to a good url the client wants, we have to send the data to client through HTTP HEADERS
 because there is no way to send arbitrary data to client without affecting user experience.
+NOTE: But now Arash don't have the expertise to work with headers (or even it's the rigtht way to send data to clients).
 
 ** We are using 'redirect' function in 'cart_pay' view to redirect user to the 'index' page of client.
 It's important to remember 'redirect' returns 'HttpRedirectResponse' instance that is a subclass of
@@ -18,11 +19,12 @@ Read documents below for more information:
 https://www.django-rest-framework.org/topics/ajax-csrf-cors/#csrf-protection
 https://docs.djangoproject.com/en/4.0/ref/csrf/#setting-the-token-on-the-ajax-request
 """
-from django.shortcuts import redirect, HttpResponse
+from django.shortcuts import redirect, render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from .pgi import zarin_pay, zarin_verify
+from core.models import Customer, Order
 
 
 # @login_required
@@ -41,17 +43,26 @@ def pay(request):
 def cart_pay(request, order_id=None):
     """It's the second step towards payment. After payment we should verify if payment was a success or not"""
     data = zarin_verify(request, order_id)
-    url_redirect_to = 'https://react-test-eosin.vercel.app/'
-    response = redirect(url_redirect_to)
+
+    # Full stack django:
+    if data['status'] == 'OK':
+        order = Order.objects.get(order_id=order_id)
+        customer = order.customer
+        data.update({'order': order, 'customer': customer})
+    return render(request, template_name='core/templates/payment_result.html', context=data)
+
+    # All commands below are just for clinet-server architecture #
+    # url_redirect_to = 'https://react-test-eosin.vercel.app/'
+    # response = redirect(url_redirect_to, permanent=True)
 
     # We can either send the data as a dictionary or send them seprately:
     # 1- Seprately
     # for k, v in data.items():
     #     response.headers[k] = v
     # 2- As dictionary
-    response.headers['payment_response'] = data
-    response.headers['status'] = data['status']
+    # response.headers['payment_response'] = data
+    # response.headers['status'] = data['status']
     # We now redirect customer to main page
 
-    return response
+    # return response
     # return JsonResponse(data=data, safe=False)
