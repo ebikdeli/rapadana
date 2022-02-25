@@ -36,7 +36,8 @@ def pay(request):
     data = zarin_pay(request)
     if 'url' in data.keys():
         return redirect(data['url'])
-    return JsonResponse(data=data, safe=False)
+    return render(request, 'core/templates/payment_failed.html', context=data)
+    # return JsonResponse(data=data, safe=False)
 
 
 @csrf_exempt
