@@ -61,6 +61,7 @@ class Payment(models.Model):
     authority = models.CharField(verbose_name=_('authority code'), max_length=50, blank=True)
     peigiry = models.CharField(verbose_name=_('peigiry code'), max_length=6, blank=True)
     time = models.DateTimeField(verbose_name=_('time'), auto_now_add=True)
+    extra_data = models.JSONField(verbose_name=_('extra data'), blank=True, null=True)
 
     def __str__(self) -> str:
         return f'order({self.order.id})_payment({self.id})'

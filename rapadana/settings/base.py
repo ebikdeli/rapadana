@@ -60,6 +60,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rapadana.wsgi.application'
 
+# sqlite3
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -70,6 +71,20 @@ DATABASES = {
                     }
     }
 }
+
+"""
+# postgres
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'rapadana_db',
+        'USER': 'rapadana_ehsan',
+        'PASSWORD': 'Ehsan19921371',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
+"""
 
 # Using django memcache for caching
 """
