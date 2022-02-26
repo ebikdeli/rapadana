@@ -11,6 +11,9 @@ import os
 
 from django.core.asgi import get_asgi_application
 
+# For development
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'rapadana.settings.dev')
+# For production
+# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'rapadana.settings.production')
 
 application = get_asgi_application()

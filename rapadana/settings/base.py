@@ -141,6 +141,8 @@ THOUSAND_SEPARATOR = ','
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
+# To deploy on Host:
+# STATIC_ROOT = '/home/rapadana/public_html/static/backend'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR),
@@ -149,6 +151,8 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# To deploy on Host:
+# MEDIA_ROOT = '/home/rapadana/public_html/media/backend'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
