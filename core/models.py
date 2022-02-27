@@ -18,6 +18,7 @@ class Customer(models.Model):
                              blank=True,
                              validators= [MaxLengthValidator(13, _('phone number is too long')),
                                           MinLengthValidator(11, _('phone number length is too short'))])
+    message = models.TextField(verbose_name=_('customer message'), blank=True)
     slug = models.SlugField(verbose_name=_('slug'), blank=True)
     created = models.DateTimeField(verbose_name=_('customer joined'), auto_now_add=True)
     updated = models.DateTimeField(verbose_name=_('customer specs updated'), auto_now=True)

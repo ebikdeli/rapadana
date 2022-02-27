@@ -218,3 +218,33 @@ class OrderUserSerializer(OrderAdminSerializer):
     customer = CustomerUserSerializer(many=False, read_only=True)
     class Meta(OrderAdminSerializer.Meta):
         exclude = ['url', ]
+
+
+class CustomerRequestSerializer(serializers.Serializer):
+    """This Serializer used to get initial customer requests (serializer.Serializer used only for learning purpose)"""
+    name = serializers.CharField()
+    message = serializers.CharField()
+
+    def create(self, validated_data):
+        """serializer.Serializer does not have 'create' method by default. We should make the 'create' for it"""
+        name = validated_data.get('name', None)
+        message = validated_data.get('message', None)
+
+        # If no 'name' or 'message' entered raise error:
+        if not name:
+            raise ValidationError(detail={'error': 'No name entered'})
+        if not message:
+            raise ValidationError(detail={'error': 'No message entered'})
+
+        customer_qs = Customer.objects.filter(name=name)
+
+        # If customer already exists just update the 'message' field:
+        if customer_qs.exists():
+            customer = customer_qs.first()
+            customer.message = message
+            customer.save()
+        # If there is no customer with the name create a new user:
+        else:
+            customer = Customer.objects.create(**validated_data)
+        
+        return customer

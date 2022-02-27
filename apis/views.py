@@ -9,11 +9,13 @@ from django.contrib.auth import get_user_model
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework import status
 from django_filters import rest_framework as filter
 
 from core.models import Customer, Order
-from .serializers import CustomerAdminSerializer, OrderAdminSerializer, UserSerializer, OrderUserSerializer
+from .serializers import CustomerAdminSerializer, OrderAdminSerializer, UserSerializer,\
+                         OrderUserSerializer, CustomerRequestSerializer
 from .filters import OrderFilterset, CustomerFilterset , UserFilterset
 
 
@@ -123,3 +125,19 @@ class OrderViewSet(ModelViewSet):
         # If user in not authenticated as admin, Do not return any information from database to user: #
         else:
             return Response(data={'info': 'No order id or customer name entered'}, status=status.HTTP_200_OK)
+
+
+class CustomerRequest(APIView):
+    """Simple API view to get customer request and save data in database (APIView just used for learning purpose)"""
+    def get(self, request, format=None):
+        return Response(data='This api working perfectly', status=status.HTTP_200_OK)
+
+    def post(self, request, format=None):
+        name = request.POST.get('name', None)
+        message = request.POST.get('message', None)
+        serializer = CustomerRequestSerializer(instance=None, data={'name': name, 'message': message})
+        serializer.is_valid()
+        # print(serializer.validated_data)
+        serializer.save()
+        # print(serializer.data)
+        return Response(data='Data successfully received', status=status.HTTP_200_OK)
