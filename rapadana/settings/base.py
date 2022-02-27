@@ -9,6 +9,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
 
     'rest_framework',
     'django_filters',
@@ -142,7 +143,7 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
 # To deploy on Host:
-# STATIC_ROOT = '/home/rapadana/public_html/static/backend'
+# STATIC_ROOT = '/home/rapadana/public_html/static'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR),
@@ -152,7 +153,7 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # To deploy on Host:
-# MEDIA_ROOT = '/home/rapadana/public_html/media/backend'
+# MEDIA_ROOT = '/home/rapadana/public_html/media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

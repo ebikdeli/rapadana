@@ -8,6 +8,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
 from django.shortcuts import redirect
+from django.contrib.sitemaps.views import sitemap
+
+from core.sitemaps import CustomerSitemap, OrderSitemap
 
 
 def index(request):
@@ -31,11 +34,16 @@ def redirect_header(request):
     re.headers['persian'] = 'چرا inchenin ast'
     return re
 
+# This is for import sitemaps:
+sitemaps = {'customer': CustomerSitemap, 'order': OrderSitemap}
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('accounts/', include('accounts.urls')),
     path('api/', include('apis.urls')),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
+     name='django.contrib.sitemaps.views.sitemap'),
     path('', index, name='index'),
     path('re', redirect_header)
 ]
