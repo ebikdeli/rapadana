@@ -6,6 +6,7 @@ In Serializers only we use 'many=True' argument when our 'instance' argument is 
 is 'empty'. But if we want to use a model instance we should set 'many=False'.
 """
 from django.contrib.auth import get_user_model
+from django.http import JsonResponse
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
@@ -135,9 +136,15 @@ class CustomerRequest(APIView):
     def post(self, request, format=None):
         name = request.POST.get('name', None)
         message = request.POST.get('message', None)
+
+        if not name:
+            return JsonResponse(data={'Error': 'No name received'}, status=status.HTTP_200_OK)
+        if not message:
+            return JsonResponse(data={'Error': 'No message enterd'}, status=status.HTTP_200_OK)
+        
         serializer = CustomerRequestSerializer(instance=None, data={'name': name, 'message': message})
         serializer.is_valid()
         # print(serializer.validated_data)
         serializer.save()
         # print(serializer.data)
-        return Response(data='Data successfully received', status=status.HTTP_200_OK)
+        return Response(data={'success': 'Data successfully received'}, status=status.HTTP_200_OK)
