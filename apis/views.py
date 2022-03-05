@@ -138,9 +138,9 @@ class CustomerRequest(APIView):
         message = request.POST.get('message', None)
 
         if not name:
-            return JsonResponse(data={'Error': 'No name received'}, status=status.HTTP_200_OK)
+            return Response(data={'Error': 'No name received'}, status=status.HTTP_200_OK)
         if not message:
-            return JsonResponse(data={'Error': 'No message enterd'}, status=status.HTTP_200_OK)
+            return Response(data={'Error': 'No message enterd'}, status=status.HTTP_200_OK)
         
         serializer = CustomerRequestSerializer(instance=None, data={'name': name, 'message': message})
         serializer.is_valid()
