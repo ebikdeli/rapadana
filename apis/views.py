@@ -1,12 +1,19 @@
 """
+Based on DRF documents, to get request data from 'GET' method we should use 'request.queryparams' instead of
+'reqeust.GET' and in other methods like 'POST', 'PUT', 'PATCH' and etc we should use 'request.data' instead of
+'request.POST':
+https://www.django-rest-framework.org/api-guide/requests/#request-parsing 
+
 This is how we query many to one relation (Or even one to one) relations
 https://docs.djangoproject.com/en/4.0/topics/db/examples/many_to_one/#many-to-one-relationships
+
+In DRF if want to get POST data, we better use 'request.data' rather than 'request.POST'.
+https://www.django-rest-framework.org/api-guide/requests/#data
 
 In Serializers only we use 'many=True' argument when our 'instance' argument is a QuerySet even if the queryset
 is 'empty'. But if we want to use a model instance we should set 'many=False'.
 """
 from django.contrib.auth import get_user_model
-from django.http import JsonResponse
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
@@ -134,13 +141,16 @@ class CustomerRequest(APIView):
         return Response(data='This api working perfectly', status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
-        name = request.POST.get('name', None)
-        message = request.POST.get('message', None)
+        # name = request.POST.get('name', None)
+        # message = request.POST.get('message', None)
+
+        name = request.data.get('name', None)
+        message = request.data.get('message', None)
 
         if not name:
-            return Response(data={'Error': 'No name received'}, status=status.HTTP_200_OK)
+            return Response(data={'Error': 'No name received'}, status=status.HTTP_400_BAD_REQUEST)
         if not message:
-            return Response(data={'Error': 'No message enterd'}, status=status.HTTP_200_OK)
+            return Response(data={'Error': 'No message enterd'}, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = CustomerRequestSerializer(instance=None, data={'name': name, 'message': message})
         serializer.is_valid()
