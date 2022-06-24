@@ -3,8 +3,6 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
 INSTALLED_APPS = [
-    # 'grappelli',
-    'filebrowser',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -16,7 +14,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'corsheaders',
-    # 'tinymce',
     'ckeditor',
     'ckeditor_uploader',
     # 'rest_framework.authtoken',
@@ -238,33 +235,3 @@ CKEDITOR_CONFIGS = {
         'width': 900,
     },
 }
-
-
-# TinyMce configs(required)
-
-# TINYMCE_JS_URL = os.path.join(STATIC_URL, "tinymce/tinymce.min.js")
-
-# TINYMCE_JS_ROOT = os.path.join(STATIC_ROOT, "tiny_mce")
-
-# TimyMce(optional)
-"""
-TINYMCE_DEFAULT_CONFIG = {
-    "height": "500px",
-    "width": "900px",
-    "menubar": "file edit view insert format tools table help",
-    "plugins": "advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code "
-    "fullscreen insertdatetime media table paste code help wordcount spellchecker",
-    "toolbar": "undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft "
-    "aligncenter alignright alignjustify | outdent indent |  numlist bullist checklist | forecolor "
-    "backcolor casechange permanentpen formatpainter removeformat | pagebreak | charmap emoticons | "
-    "fullscreen  preview save print | insertfile image media pageembed template link anchor codesample | "
-    "a11ycheck ltr rtl | showcomments addcomment code",
-    "custom_undo_redo_levels": 10,
-    "image_caption": True,
-    # "language": "es_ES",  # To force a specific language instead of the Django current language.
-}
-"""
-# FILEBROWSER_DIRECTORY = ''
-# DIRECTORY = ''
-
-# X_FRAME_OPTIONS = 'SAMEORIGIN'

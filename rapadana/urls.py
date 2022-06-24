@@ -39,14 +39,11 @@ def redirect_header(request):
 sitemaps = {'customer': CustomerSitemap, 'order': OrderSitemap}
 
 urlpatterns = [
-    # path('admin/filebrowser/', site.urls),
-    # path('grappelli/', include('grappelli.urls')),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('accounts/', include('accounts.urls')),
     path('api/', include('apis.urls')),
     path('ckeditor/', include('ckeditor_uploader.urls')),
-    # path('tinymce/', include('tinymce.urls')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
      name='django.contrib.sitemaps.views.sitemap'),
     path('', index, name='index'),

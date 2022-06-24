@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-# from tinymce.models import HTMLField
 from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 
@@ -16,7 +15,6 @@ class Blog(models.Model):
                                on_delete=models.CASCADE,
                                related_name='blog_author')
     title = models.CharField(verbose_name=_('title'), max_length=200)
-    # content = HTMLField(verbose_name=_('content'))
     # content = RichTextField(verbose_name=_('content'))
     content = RichTextUploadingField(verbose_name=_('content'))
     likes = models.PositiveIntegerField(verbose_name=_('likes'), default=0)
@@ -46,7 +44,7 @@ class Blog(models.Model):
         if not self.slug:
             self.slug = slugify(f'{self.title}')
         if self.updated:
-            self.slug = slugify(f'{self.title}_{self.updated.strftime("%Y-%m-%d.%H-%M")}')
+            self.slug = slugify(f'{self.title}_{self.updated.strftime("%Y-%m-%d---%H-%M")}')
         super().save(*args, **kwargs)
 
 

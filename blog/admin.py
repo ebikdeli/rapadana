@@ -1,7 +1,5 @@
 from django.contrib import admin
 from django.contrib.contenttypes import admin as ct_admin
-from django.db import models
-from tinymce.widgets import TinyMCE
 
 from .models import Blog, Comment, File
 from .forms import BlogModelForm
