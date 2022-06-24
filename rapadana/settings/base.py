@@ -16,6 +16,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'ckeditor',
     'ckeditor_uploader',
+    'axes',
     # 'rest_framework.authtoken',
     # 'taggit',
     # 'django_quill',
@@ -39,6 +40,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'rapadana.urls'
@@ -168,6 +171,22 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
 
 LOGOUT_REDIRECT_URL = '/'
+
+
+AUTHENTICATION_BACKENDS = [
+    # AxesBackend should be the first backend in the AUTHENTICATION_BACKENDS list.
+    'axes.backends.AxesBackend',
+
+    # Django ModelBackend is the default authentication backend.
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# django-axes optional config:
+# https://django-axes.readthedocs.io/en/latest/4_configuration.html
+
+AXES_FAILURE_LIMIT = 5
+AXES_ONLY_USER_FAILURES = True
+
 
 # We can also use 'reverse_lazy' to handle login and logout urls
 
