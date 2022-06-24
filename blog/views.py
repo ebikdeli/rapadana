@@ -1,3 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
 
-# Create your views here.
+
+def some_blog(request):
+    return HttpResponse("<h1>Subdomain blog just works!</h1>")

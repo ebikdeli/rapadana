@@ -3,7 +3,6 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import tinymce.models
 
 
 class Migration(migrations.Migration):
@@ -45,7 +44,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=200, verbose_name='title')),
-                ('content', tinymce.models.HTMLField(verbose_name='content')),
+                ('content', models.TextField(verbose_name='content')),
                 ('likes', models.PositiveIntegerField(default=0, verbose_name='likes')),
                 ('is_published', models.BooleanField(default=True, verbose_name='is published')),
                 ('publish_date', models.DateTimeField(auto_now_add=True, verbose_name='publish date')),

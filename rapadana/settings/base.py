@@ -1,6 +1,9 @@
 import os
 
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+
+SITE_ID = 1
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -18,6 +21,7 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'axes',
     'sorl.thumbnail',
+    'django_hosts',
     # 'rest_framework.authtoken',
     # 'taggit',
     # 'django_quill',
@@ -31,6 +35,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django_hosts.middleware.HostsRequestMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -42,10 +47,17 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
+    'django_hosts.middleware.HostsResponseMiddleware',
     'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'rapadana.urls'
+
+# For django_hosts
+ROOT_HOSTCONF = 'rapadana.hosts'
+
+DEFAULT_HOST = 'www'
+
 
 TEMPLATES = [
     {
