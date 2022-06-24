@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 # from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
+from django_hosts.resolvers import reverse
 
 
 class Blog(models.Model):
@@ -46,7 +47,10 @@ class Blog(models.Model):
         if self.updated:
             self.slug = slugify(f'{self.title}_{self.updated.strftime("%Y-%m-%d---%H-%M")}')
         super().save(*args, **kwargs)
-
+    
+    def get_absolute_url(self):
+        return reverse("blog:blog_detail_view", kwargs={"slug": self.slug}, host='www')
+    
 
 class Comment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,

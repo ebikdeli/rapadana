@@ -257,6 +257,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 # CKEDITOR_BASEPATH = f"{STATIC_URL}ckeditor/ckeditor/"
 CKEDITOR_BASEPATH = (os.path.join(STATIC_URL, 'ckeditor', 'ckeditor', '')).replace("\\", "/")		# Works on windows machine
 CKEDITOR_UPLOAD_PATH = "uploads/"
+# CKEDITOR_JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js'
+# CKEDITOR_IMAGE_BACKEND = "pillow"
 
 # CKEditor optional settings
 CKEDITOR_CONFIGS = {
