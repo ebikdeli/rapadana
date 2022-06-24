@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'ckeditor',
     'ckeditor_uploader',
     'axes',
+    'sorl.thumbnail',
     # 'rest_framework.authtoken',
     # 'taggit',
     # 'django_quill',

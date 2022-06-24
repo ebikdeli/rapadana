@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from ckeditor.fields import RichTextField
+# from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 
 

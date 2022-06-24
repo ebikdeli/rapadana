@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractUser, PermissionsMixin, UserManager
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MaxValueValidator, MinValueValidator, MaxLengthValidator, MinLengthValidator
+from sorl.thumbnail import ImageField
 
 
 class MyUserManager(UserManager):
@@ -36,8 +37,10 @@ class User(AbstractUser):
                             blank=True
                         )
     address = models.TextField(verbose_name=_('address'), blank=True)
-    picture = models.ImageField(verbose_name=_('user picture'), blank=True)
-    background = models.ImageField(verbose_name=_('profile background'), blank=True)
+    # picture = models.ImageField(verbose_name=_('user picture'), blank=True)
+    picture = ImageField(verbose_name=_('user picture'), blank=True)
+    # background = models.ImageField(verbose_name=_('profile background'), blank=True)
+    background = ImageField(verbose_name=_('profile background'), blank=True)
     score = models.IntegerField(verbose_name=_('user score'), default=0)
     score_lifetime = models.IntegerField(verbose_name=_('user life time score'), default=0)
     discount_value = models.DecimalField(verbose_name=_('user discount(value)'), default=0, max_digits=9,
