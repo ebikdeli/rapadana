@@ -11,6 +11,9 @@
         {% for blog in blogs %}
             <p>{{ blog.title }}</p>
             <p>{{ blog.content|safe }}</p>
+            {% if blog.title_image %}
+                <br><div align="center"><img src="{{ blog.title_image.url }}" alt="blog image" width="800px" height="600px"></div>
+            {% endif %}
         {% endfor %}
     {% else %}
         <h2>There is no blogs</h2>

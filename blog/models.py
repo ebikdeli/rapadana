@@ -7,6 +7,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 # from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 from django_hosts.resolvers import reverse
+from sorl.thumbnail import ImageField
 
 
 class Blog(models.Model):
@@ -16,6 +17,7 @@ class Blog(models.Model):
                                on_delete=models.CASCADE,
                                related_name='blog_author')
     title = models.CharField(verbose_name=_('title'), max_length=200)
+    title_image = ImageField(verbose_name=_('title image'), blank=True)
     # content = RichTextField(verbose_name=_('content'))
     content = RichTextUploadingField(verbose_name=_('content'))
     likes = models.PositiveIntegerField(verbose_name=_('likes'), default=0)
@@ -49,7 +51,7 @@ class Blog(models.Model):
         super().save(*args, **kwargs)
     
     def get_absolute_url(self):
-        return reverse("blog:blog_detail_view", kwargs={"slug": self.slug}, host='www')
+        return reverse("blog:blog_detail_view", kwargs={"slug": self.slug}, host='blog')
     
 
 class Comment(models.Model):

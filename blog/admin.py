@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.contenttypes import admin as ct_admin
+from sorl.thumbnail.admin import AdminImageMixin
 
 from .models import Blog, Comment, File
 from .forms import BlogModelForm
@@ -14,7 +15,7 @@ class CommentAdminInline(ct_admin.GenericStackedInline):
 
 
 @admin.register(Blog)
-class BlogAdmin(admin.ModelAdmin):
+class BlogAdmin(AdminImageMixin, admin.ModelAdmin):
     inlines = [FileAdminInline, CommentAdminInline]
     form = BlogModelForm
 
