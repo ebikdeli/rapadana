@@ -1,8 +1,12 @@
-from django.shortcuts import render, HttpResponse
-from django.views.generic import ListView, DetailView, CreateView
+from django.shortcuts import render, HttpResponse, redirect
+from django.views.generic import ListView, DetailView, CreateView,\
+    UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.urls import reverse as rev
+from django_hosts.resolvers import reverse_lazy, reverse, reverse_host
 
 from .models import Blog
+from .forms import BlogModelForm
 
 
 def some_blog(request):
@@ -17,11 +21,54 @@ class BlogListView(ListView):
 
 class BlogDetalView(DetailView):
     """Everyone can every blog with detail"""
+    template_name = 'blog/templates/blog/blog_detail_view.html'
+    model = Blog
+    context_object_name = 'blog'
 
 
-class BlogCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class BlogCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     """Only authorized users can create new blog"""
+    template_name = 'blog/templates/blog/blog_create_view.html'
+    permission_required = ['accounts.can_create_blog', 'accounts.can_update_blog', 'accounts.can_delete_blog']
+    # form_class = BlogModelForm
+    model = Blog
+    fields = ['author', 'title_image', 'title', 'content']
+    context_object_name = 'blog'
+    # slug_field = 'slug'
+    # success_url = reverse_lazy('blog:blog_detail', kwargs={'slug': slug_field}, host='www')
 
+    def get_success_url(self) -> str:
+        print('current object:   ', self.object, '     slug field: ',self.object.slug)
+        if self.object:
+            url = rev('blog:blog_detail', kwargs={'slug': self.object.slug})
+            # url = reverse('blog_detail', args=(self.object.slug), host='www')
+            # print(reverse_host('www', args=('www',)))
+            # url = reverse('blog:blog_list', host_args=('blog'), host='blog')
+            # print(reverse_host('www', args=('',)))
+            # url = reverse('blog:blog_list', host='www')
+            print(url)
+            # return reverse('blog:blog_detail', kwargs={'slug': self.slug_field}, host='www')
+            return url
+        return reverse('blog:blog_list', host='www')
+
+
+class BlogUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    """Only authorized users can Update a blog"""
+    template_name = 'blog/templates/blog/blog_update_view.html'
+    permission_required = ['accounts.can_create_blog', 'accounts.can_update_blog', 'accounts.can_delete_blog']
+    form_class = BlogModelForm
+    context_object_name = 'blog'
+    slug_field = 'slug'
+    success_url = reverse_lazy('blog:blog_detail', slug=slug_field, host='www')
+
+
+class BlogDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    """Only authorized users can delete a blog"""
+    success_url = reverse_lazy('blog:blog_list', host='www')
+    permission_required = ['accounts.can_create_blog', 'accounts.can_update_blog', 'accounts.can_delete_blog']
+
+
+# Below views are test for html to pdf converter
 
 # importing the necessary libraries
 from django.http import HttpResponse

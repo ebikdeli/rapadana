@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load hosts %}
+
+{% block title %}Create new blog{% endblock title %}
+
+{% block content %}
+<h1>Create new blog</h1>
+
+<form action="" method="post">
+    {% csrf_token %}
+    <table>
+        {{ form.media }}
+        {{ form.as_p }}
+    </table>
+    <input type="submit" value="Create blog">
+</form>
+{% endblock content %}

@@ -1,5 +1,4 @@
 import os
-from django_hosts.resolvers import reverse_host_lazy, reverse_lazy, reverse_host
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
