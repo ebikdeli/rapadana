@@ -10,6 +10,16 @@ ALLOWED_HOSTS = ['.rapadana.ir', ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
+SESSION_COOKIE_SECURE = False
+# CSRF_COOKIE_SECURE = False
+SECURE_SSL_REDIRECT = False
+
+MAIN_PORT = 443 if SECURE_SSL_REDIRECT else 80
+
+MAIN_SCHEME = 'https' if SECURE_SSL_REDIRECT else 'http'
+
+PARENT_HOST = 'rapadana.ir'
+
 try:
     from .local import *
 except ImportError:

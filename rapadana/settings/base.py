@@ -58,6 +58,19 @@ ROOT_HOSTCONF = 'rapadana.hosts'
 
 DEFAULT_HOST = 'www'
 
+# PARENT_HOST = 'localhost' if settings.DEBUG else 'example.com'
+
+# if settings.DEBUG:
+#     MAIN_PORT = 8000
+# else:
+#     MAIN_PORT = 443 if settings.SECURE_SSL_REDIRECT else 80
+
+# MAIN_PORT = 8000 if settings.DEBUG else 443 if settings.SECURE_SSL_REDIRECT else 80
+
+# MAIN_SCHEME = 'http' if settings.DEBUG else 'https' if settings.SECURE_SSL_REDIRECT else 'http'
+
+
+# Templates
 
 TEMPLATES = [
     {

@@ -47,7 +47,8 @@ class Blog(models.Model):
         if not self.slug:
             self.slug = slugify(f'{self.title}')
         if self.updated:
-            self.slug = slugify(f'{self.title}_{self.updated.strftime("%Y-%m-%d---%H-%M")}')
+            # self.slug = slugify(f'{self.title}_{self.updated.strftime("%Y-%m-%d---%H-%M")}')  This is complex and slow
+            self.slug = slugify(f'{self.title}')
         super().save(*args, **kwargs)
     
     def get_absolute_url(self):

@@ -1,4 +1,5 @@
 from django.shortcuts import render, HttpResponse, redirect
+from django.conf import settings
 from django.views.generic import ListView, DetailView, CreateView,\
     UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -40,8 +41,12 @@ class BlogCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     def get_success_url(self) -> str:
         print('current object:   ', self.object, '     slug field: ',self.object.slug)
         if self.object:
-            url = rev('blog:blog_detail', kwargs={'slug': self.object.slug})
-            # url = reverse('blog_detail', args=(self.object.slug), host='www')
+            # url = rev('blog:blog_detail', kwargs={'slug': self.object.slug})
+            print(reverse_host('www', args=('www',)))
+            
+            # url = reverse(viewname='blog:blog_detail', kwargs={'slug': self.object.slug}, host_args=('www',), host='www', scheme='http', port='8000')
+            url = reverse(viewname='blog:blog_detail', kwargs={'slug': self.object.slug}, host_args=('www',), host='www',
+                          scheme=settings.MAIN_SCHEME, port=str(settings.MAIN_PORT))
             # print(reverse_host('www', args=('www',)))
             # url = reverse('blog:blog_list', host_args=('blog'), host='blog')
             # print(reverse_host('www', args=('',)))
@@ -49,7 +54,7 @@ class BlogCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
             print(url)
             # return reverse('blog:blog_detail', kwargs={'slug': self.slug_field}, host='www')
             return url
-        return reverse('blog:blog_list', host='www')
+        return reverse('blog:blog_list', host='www', host_args=('www',), scheme=settings.MAIN_SCHEME, port=str(settings.MAIN_PORT))
 
 
 class BlogUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
@@ -57,14 +62,19 @@ class BlogUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     template_name = 'blog/templates/blog/blog_update_view.html'
     permission_required = ['accounts.can_create_blog', 'accounts.can_update_blog', 'accounts.can_delete_blog']
     form_class = BlogModelForm
+    queryset = Blog.objects.all()
     context_object_name = 'blog'
     slug_field = 'slug'
-    success_url = reverse_lazy('blog:blog_detail', slug=slug_field, host='www')
+
+    def get_success_url(self) -> str:
+        success_url = reverse('blog:blog_detail', kwargs={'slug': (self.object.slug)}, host='www', host_args=('www',), scheme=settings.MAIN_SCHEME, port=str(settings.MAIN_PORT))
+        return success_url
+    # success_url = reverse_lazy('blog:blog_detail', kwargs={'slug': (get_slug_field())}, host='www', host_args=('www',), scheme=settings.MAIN_SCHEME, port=str(settings.MAIN_PORT))
 
 
 class BlogDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """Only authorized users can delete a blog"""
-    success_url = reverse_lazy('blog:blog_list', host='www')
+    success_url = reverse_lazy('blog:blog_list', host='www', host_args=('www',), scheme=settings.MAIN_SCHEME, port=str(settings.MAIN_PORT))
     permission_required = ['accounts.can_create_blog', 'accounts.can_update_blog', 'accounts.can_delete_blog']
 
 
