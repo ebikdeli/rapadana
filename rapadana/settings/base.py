@@ -28,6 +28,22 @@ INSTALLED_APPS = [
     # 'django_countries',
     # 'social_django',
 
+    'wagtail.contrib.forms',
+    'wagtail.contrib.redirects',
+    'wagtail.embeds',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail',
+
+    'modelcluster',
+    'taggit',
+
+    'home',
     'accounts.apps.AccountsConfig',
     'apis.apps.ApisConfig',
     'core.apps.CoreConfig',
@@ -46,6 +62,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 
     'django_hosts.middleware.HostsResponseMiddleware',
     'axes.middleware.AxesMiddleware',
@@ -282,3 +300,16 @@ CKEDITOR_CONFIGS = {
         'width': 900,
     },
 }
+
+# Wagtail settings
+
+WAGTAIL_SITE_NAME = 'Rapadana'
+
+WAGTAILADMIN_BASE_URL = '/wagtail-admin/'
+
+# This is custom setting for features in wagtail text editor
+# https://docs.wagtail.org/en/stable/advanced_topics/customisation/page_editing_interface.html
+WAGTAIL_EDITOR_FEAUTURES = [
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'bold', 'italic', 'ol', 'ul', 'hr', 'link', 'document-link', 'image', 'embed', 'code',
+    'superscript', 'subscript', 'strikethrough', 'blockquote',
+]
