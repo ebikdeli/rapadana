@@ -23,6 +23,7 @@ class Blog(models.Model):
     likes = models.PositiveIntegerField(verbose_name=_('likes'), default=0)
     is_published = models.BooleanField(verbose_name=_('is published'), default=True)
     publish_date = models.DateTimeField(verbose_name=_('publish date'), auto_now_add=True)
+    minute_read = models.PositiveIntegerField(verbose_name=_('minute to read'), default=0)
     updated = models.DateTimeField(verbose_name=_('updated'), auto_now=True)
     slug = models.SlugField(blank=True)
     comments = GenericRelation('Comment')
@@ -52,7 +53,8 @@ class Blog(models.Model):
         super().save(*args, **kwargs)
     
     def get_absolute_url(self):
-        return reverse("blog:blog_detail", kwargs={"slug": self.slug}, host='www')
+        return reverse(viewname="blog:blog_detail", kwargs={"slug": self.slug}, host_args=('www',),
+                       host='www', scheme=settings.MAIN_SCHEME, port=str(settings.MAIN_PORT))
     
 
 class Comment(models.Model):
