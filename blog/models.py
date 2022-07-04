@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.sitemaps import ping_google
 # from ckeditor.fields import RichTextField
 from ckeditor_uploader.fields import RichTextUploadingField
 from django_hosts.resolvers import reverse
@@ -51,6 +52,10 @@ class Blog(models.Model):
             # self.slug = slugify(f'{self.title}_{self.updated.strftime("%Y-%m-%d---%H-%M")}')  This is complex and slow
             self.slug = slugify(f'{self.title}')
         super().save(*args, **kwargs)
+
+        # When using 'google search' and creating 'sitemap' for the model, we can ping google for SEO matter!
+        # https://docs.djangoproject.com/en/dev/ref/contrib/sitemaps/#pinging-google
+        # ping_google()
     
     def get_absolute_url(self):
         return reverse(viewname="blog:blog_detail", kwargs={"slug": self.slug}, host_args=('www',),

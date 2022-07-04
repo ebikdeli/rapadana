@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'axes',
     'sorl.thumbnail',
     'django_hosts',
+    'constance',
     # 'rest_framework.authtoken',
     # 'taggit',
     # 'django_quill',
@@ -48,6 +49,8 @@ INSTALLED_APPS = [
     'apis.apps.ApisConfig',
     'core.apps.CoreConfig',
     'blog',
+
+    'constance.backends.database',
 ]
 
 MIDDLEWARE = [
@@ -313,3 +316,15 @@ WAGTAIL_EDITOR_FEAUTURES = [
     'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'bold', 'italic', 'ol', 'ul', 'hr', 'link', 'document-link', 'image', 'embed', 'code',
     'superscript', 'subscript', 'strikethrough', 'blockquote',
 ]
+
+
+# django-constance settings
+CONSTANCE_CONFIG = {
+    'discount': (5, 'Global discount percent'),
+}
+
+CONSTANCE_IGNORE_ADMIN_VERSION_CHECK = True
+
+# By default django uses 'redis' to store 'constance' variables. to use database we should follow this document:
+# https://django-constance.readthedocs.io/en/latest/backends.html#database
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'

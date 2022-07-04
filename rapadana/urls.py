@@ -14,10 +14,12 @@ from wagtail import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
 from filebrowser.sites import site
 
-from core.sitemaps import CustomerSitemap, OrderSitemap
+from core.sitemaps import IndexStaicSitemap
 
 
 def index(request):
+    from constance import config
+    print('"constance" discount percent: ', config.discount)
     data = ['welcome to bigtek. It\'s showing API works properly', {'status_code': 200, 'verify': 'OK'}]
     response = JsonResponse(data=data, safe=False)
 
@@ -39,7 +41,7 @@ def redirect_header(request):
     return re
 
 # This is for import sitemaps:
-sitemaps = {'customer': CustomerSitemap, 'order': OrderSitemap}
+sitemaps = {'index_sitemap': IndexStaicSitemap}
 
 urlpatterns = [
     path('admin/', admin.site.urls),
