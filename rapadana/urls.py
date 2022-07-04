@@ -9,10 +9,11 @@ from django.conf.urls.static import static
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.contrib.sitemaps.views import sitemap
+
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
-from filebrowser.sites import site
+# from two_factor.urls import urlpatterns as tf_urls
 
 from core.sitemaps import IndexStaicSitemap
 
@@ -29,6 +30,7 @@ def index(request):
 
     return response
     # return JsonResponse(data=data, safe=False)
+
 
 def redirect_header(request):
     """This simple view show us how to return data to client with headers"""
@@ -47,6 +49,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('blog/', include('blog.urls')),
     path('api-auth/', include('rest_framework.urls')),
+    # path('tf/', include(tf_urls)),
     path('accounts/', include('accounts.urls')),
     path('api/', include('apis.urls')),
     path('ckeditor/', include('ckeditor_uploader.urls')),

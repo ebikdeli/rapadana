@@ -1,3 +1,5 @@
+from django.urls import reverse_lazy
+
 import os
 
 
@@ -23,6 +25,16 @@ INSTALLED_APPS = [
     'sorl.thumbnail',
     'django_hosts',
     'constance',
+
+    # 'django_otp',
+    # 'django_otp.plugins.otp_static',
+    # 'django_otp.plugins.otp_totp',
+    # 'django_otp.plugins.otp_email',  # <- if you want email capability.
+    # 'two_factor',
+    # 'two_factor.plugins.phonenumber',  # <- if you want phone number capability.
+    # 'two_factor.plugins.email',  # <- if you want email capability.
+    # 'two_factor.plugins.yubikey',  # <- for yubikey capability.
+
     # 'rest_framework.authtoken',
     # 'taggit',
     # 'django_quill',
@@ -63,6 +75,9 @@ MIDDLEWARE = [
     # 'django.middleware.cache.FetchFromCacheMiddleware',     # for per site cache
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+
+    # 'django_otp.middleware.OTPMiddleware',
+
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
@@ -211,13 +226,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Login and Logout urls
+# Login and Logout urls (django two factor authentication override these settings)
+# LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = reverse_lazy('admin:login')
 
-LOGIN_REDIRECT_URL = '/'
+# LOGIN_URL = '/login/'
+LOGIN_URL = 'admin:login'
 
-LOGIN_URL = '/login/'
-
-LOGOUT_REDIRECT_URL = '/'
+# LOGOUT_REDIRECT_URL = 'blog:blog_list'
+# LOGOUT_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = 'index'
 
 
 AUTHENTICATION_BACKENDS = [
@@ -328,3 +346,10 @@ CONSTANCE_IGNORE_ADMIN_VERSION_CHECK = True
 # By default django uses 'redis' to store 'constance' variables. to use database we should follow this document:
 # https://django-constance.readthedocs.io/en/latest/backends.html#database
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+
+
+# Django two factor authentication
+# LOGIN_URL = 'two_factor:login'
+
+# this one is optional
+# LOGIN_REDIRECT_URL = 'two_factor:profile'
