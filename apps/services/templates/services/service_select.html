@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+
+<style type="text/css">
+    th {
+      padding: 0 15px;
+    }
+</style>
+  
+{% endblock head %}
+
+{% block title %}Pick your service{% endblock title %}
+
+{% block content %}
+{% if services %}
+
+    <div align='center'>
+        <h1>Choose your services:</h1>
+    </div>
+
+    <form action="{% url 'services:order' %}" method="post">
+        {% csrf_token %}
+        <table>
+            {% for service in services.all %}
+                <tr>
+                    <th><label for="">{{ service.name }}</label></th>
+                    <th><input type="checkbox" name="service_id" value="{{ service.id }}"></th>
+                </tr>
+            {% endfor %}
+        </table>
+        <br><input type="submit" value="Submit">
+    </form>
+
+{% else %}
+
+<div align='center'>
+    <h2>There is no service to choose!</h2>
+</div>
+
+{% endif %}
+
+{% endblock content %}
