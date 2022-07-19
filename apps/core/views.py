@@ -24,7 +24,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from .pgi import zarin_pay, zarin_verify
-from core.models import Customer, Order
+from apps.core.models import Customer, Order
 
 
 # @login_required

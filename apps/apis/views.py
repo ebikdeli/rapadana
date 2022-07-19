@@ -21,7 +21,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from django_filters import rest_framework as filter
 
-from core.models import Customer, Order
+from apps.core.models import Customer, Order
 from .serializers import CustomerAdminSerializer, OrderAdminSerializer, UserSerializer,\
                          OrderUserSerializer, CustomerRequestSerializer
 from .filters import OrderFilterset, CustomerFilterset , UserFilterset

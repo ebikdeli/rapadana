@@ -21,10 +21,14 @@ INSTALLED_APPS = [
     'corsheaders',
     'ckeditor',
     'ckeditor_uploader',
+    "debug_toolbar",
     'axes',
     'sorl.thumbnail',
     'django_hosts',
     'constance',
+
+    'watchman',
+    'django_browser_reload',
 
     # 'django_otp',
     # 'django_otp.plugins.otp_static',
@@ -57,16 +61,19 @@ INSTALLED_APPS = [
     'taggit',
 
     'home',
-    'accounts.apps.AccountsConfig',
-    'apis.apps.ApisConfig',
-    'core.apps.CoreConfig',
-    'blog',
+    'apps.accounts.apps.AccountsConfig',
+    'apps.apis.apps.ApisConfig',
+    'apps.core.apps.CoreConfig',
+    'apps.blog',
 
     'constance.backends.database',
 ]
 
 MIDDLEWARE = [
     'django_hosts.middleware.HostsRequestMiddleware',
+
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -80,6 +87,8 @@ MIDDLEWARE = [
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'django_browser_reload.middleware.BrowserReloadMiddleware',
 
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 
@@ -112,7 +121,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR, 
-                 os.path.join(BASE_DIR, 'templates'),],
+                 os.path.join(BASE_DIR, 'templates'),
+                 os.path.join(BASE_DIR, 'apps')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -353,3 +363,12 @@ CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 
 # this one is optional
 # LOGIN_REDIRECT_URL = 'two_factor:profile'
+
+
+# django-debug-toolbar settings
+
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]

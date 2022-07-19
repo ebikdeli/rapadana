@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from . import views
-from core import views as core_views
+from apps.core import views as core_views
 
 
 app_name = 'api'

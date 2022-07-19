@@ -1,5 +1,5 @@
 from django.contrib.sitemaps import Sitemap
-from blog.models import Blog
+from apps.blog.models import Blog
 
 class BlogSitemap(Sitemap):
     changefreq = "weekly"

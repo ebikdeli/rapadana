@@ -13,7 +13,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from django.contrib.auth import get_user_model
 
-from core.models import Customer, Order
+from apps.core.models import Customer, Order
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):

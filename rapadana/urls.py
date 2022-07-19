@@ -15,7 +15,7 @@ from wagtail import urls as wagtail_urls
 from wagtail.documents import urls as wagtaildocs_urls
 # from two_factor.urls import urlpatterns as tf_urls
 
-from core.sitemaps import IndexStaicSitemap
+from apps.core.sitemaps import IndexStaicSitemap
 
 
 def index(request):
@@ -47,14 +47,19 @@ sitemaps = {'index_sitemap': IndexStaicSitemap}
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('blog/', include('blog.urls')),
+
+    path("__reload__/", include("django_browser_reload.urls")),
+    path('__debug__/', include('debug_toolbar.urls')),
+    path('watchman/', include('watchman.urls')),
     path('api-auth/', include('rest_framework.urls')),
-    # path('tf/', include(tf_urls)),
-    path('accounts/', include('accounts.urls')),
-    path('api/', include('apis.urls')),
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
      name='django.contrib.sitemaps.views.sitemap'),
+
+    path('blog/', include('apps.blog.urls')),
+    path('core/', include('apps.core.urls')),
+    path('accounts/', include('apps.accounts.urls')),
+    path('api/', include('apps.apis.urls')),
 
     path('cms/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
