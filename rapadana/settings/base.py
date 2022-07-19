@@ -29,6 +29,7 @@ INSTALLED_APPS = [
 
     'watchman',
     'django_browser_reload',
+    'djmoney',
 
     # 'django_otp',
     # 'django_otp.plugins.otp_static',
@@ -65,6 +66,7 @@ INSTALLED_APPS = [
     'apps.apis.apps.ApisConfig',
     'apps.core.apps.CoreConfig',
     'apps.blog',
+    'apps.services',
 
     'constance.backends.database',
 ]

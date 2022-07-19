@@ -60,6 +60,7 @@ urlpatterns = [
     path('core/', include('apps.core.urls')),
     path('accounts/', include('apps.accounts.urls')),
     path('api/', include('apps.apis.urls')),
+    path('services/', include('apps.services.urls')),
 
     path('cms/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
