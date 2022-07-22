@@ -48,7 +48,7 @@ sitemaps = {'index_sitemap': IndexStaicSitemap}
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path("__reload__/", include("django_browser_reload.urls")),
+    # path("__reload__/", include("django_browser_reload.urls")),
     path('__debug__/', include('debug_toolbar.urls')),
     path('watchman/', include('watchman.urls')),
     path('api-auth/', include('rest_framework.urls')),

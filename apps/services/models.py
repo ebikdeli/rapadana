@@ -57,6 +57,7 @@ class OrderService(models.Model):
     order_uuid = models.UUIDField(verbose_name=_('order_uuid'), default=uuid.uuid4, editable=False)
     customer = models.ForeignKey(settings.AUTH_USER_MODEL,
                                  on_delete=models.SET_NULL,
+                                 related_name='orderservice_customer',
                                  verbose_name=_('customer'),
                                  blank=True,
                                  null=True)
@@ -66,6 +67,7 @@ class OrderService(models.Model):
     content = models.TextField(verbose_name=_('contents (optional)'), blank=True)
 
     # These fields need to get changed and proccessed
+    total_service = models.PositiveIntegerField(verbose_name=_('total service'), default=0)
     order_id = models.CharField(verbose_name=_('order id'), max_length=10, blank=True)
     price = models.DecimalField(verbose_name=_('price'), max_digits=12, decimal_places=0, default=-1)
     pay = models.DecimalField(verbose_name=_('current payment'), max_digits=12, decimal_places=0, default=-1)
@@ -81,10 +83,15 @@ class OrderService(models.Model):
     updated = models.DateTimeField(verbose_name=_('order updated'), auto_now=True)
 
     def __str__(self):
-        return f'({self.id}){self.user.username}_order'
+        if self.customer:
+            return f'({self.id}){self.customer.username}_order'
+        return f'{self.id}_order'
     
     def save(self, *args, **kwargs) -> None:
         """Overriding 'save' method to fill 'slug' field"""
         if not self.slug:
-            self.slug = slugify(f'{self.user.username} order')
+            if self.customer:
+                self.slug = slugify(f'{self.customer.username} order')
+            else:
+                self.slug = slugify(f'{self.id}_order')
         super().save(*args, **kwargs)

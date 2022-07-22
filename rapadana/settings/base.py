@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'constance',
 
     'watchman',
-    'django_browser_reload',
+    # 'django_browser_reload',
     'djmoney',
 
     # 'django_otp',
@@ -90,7 +90,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    'django_browser_reload.middleware.BrowserReloadMiddleware',
+    # 'django_browser_reload.middleware.BrowserReloadMiddleware',
 
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 

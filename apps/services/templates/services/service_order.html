@@ -14,44 +14,49 @@
 {% block title %}See your service{% endblock title %}
 
 {% block content %}
-{% if services %}
+{% if has_data %}
+    {% if services %}
 
-    <div align='center'><h1>سرویس های انتخاب شده:</h1></div><br>
+        <div align='center'><h1>سرویس های انتخاب شده:</h1></div><br>
+
+        <div align='center'>
+            {% comment %}<form action="{% url 'services:order_verify' %}" method="post">{% endcomment %}
+            <form action="" method="post">
+                {% csrf_token %}
+            <table>
+                <tr>
+                    <th>نام سرویس</th>
+                        <th>قیمت (به ریال)</th>
+                    </tr>
+                    
+                    {% for service in services.all %}
+                        <input type="hidden" name="service_id" value="{{ service.id }}">
+                        <tr>
+                            <td>{{ service.name }}</td>
+                            <td>{{ service.price }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+
+                <br><h2>Total services: {{ total_service }}</h2>
+                <input type="hidden" name="total_service_number" value="{{ total_service }}">
+
+                <br><h2>Total price: {{ total_price }} IRR</h2><br><br>
+                <input type="hidden" name="total_price" value="{{ total_price }}">
+
+            <button type="submit">تایید سفارش</button>
+            </form>
+        </div>
+
+    {% else %}
 
     <div align='center'>
-        <form action="{% url 'services:order_verify' %}" method="post">
-            {% csrf_token %}
-        <table>
-            <tr>
-                <th>نام سرویس</th>
-                    <th>قیمت (به ریال)</th>
-                </tr>
-                
-                {% for service in services.all %}
-                    <input type="hidden" name="service_id" value="{{ service.id }}">
-                    <tr>
-                        <td>{{ service.name }}</td>
-                        <td>{{ service.price }}</td>
-                    </tr>
-                {% endfor %}
-            </table>
-
-            <br><h2>Total services: {{ total_service }}</h2>
-            <input type="hidden" name="total_service_number" value="{{ total_service }}">
-
-            <br><h2>Total price: {{ total_price }} IRR</h2><br><br>
-            <input type="hidden" name="total_price" value="{{ total_price }}">
-
-          <button type="submit">تایید سفارش</button>
-        </form>
+        <h2>There is no service to choose!</h2>
     </div>
 
+    {% endif %}
 {% else %}
-
-<div align='center'>
-    <h2>There is no service to choose!</h2>
-</div>
-
+<div align="center"><h1>دیتای خوب وارد کنید!</h1></div>
 {% endif %}
 
 {% endblock content %}

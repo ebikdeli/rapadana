@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+
+<style type="text/css">
+    th {
+      padding: 20px;
+    }
+</style>
+  
+{% endblock head %}
+
+{% block title %}Verify order service{% endblock title %}
+
+{% block content %}
+<div align='center'>
+    {% if order_service %}
+    <div><h1>Dear {{ request.user.username }}, your order received. Your order is this:</h1></div>
+        <div>
+            <table>
+                <tr>
+                    <th>نام مشتری</th>
+                    <th>{{ order_service.customer.username }}</th>
+                </tr>
+                <tr>
+                    <th>شماره سفارش</th>
+                    <th>{{ order_service.order_uuid }}</th>
+                </tr>
+                <tr>
+                    <th>قیمت(ریال)</th>
+                    <th>{{ order_service.price }}</th>
+                </tr>
+            </table>
+            <h2>لیست خدمات انتخاب شده:</h2><br>
+            <table>
+                    <tr>
+                        <th>سرویس</th>
+                        <th>قیمت(ریال)</th>
+                    </tr>
+        
+                    {% for se in order_service.service.all %}
+                    <tr>
+                        <td>{{ se.name }}</td>
+                        <td>{{ se.price }}</td>
+                    </tr>
+                    {% endfor %}
+                    <br>
+                    <tr>
+                        <th>تعداد خدمات انتخاب شده</th>
+                        <th>{{ order_service.total_service}} </th>
+                    </tr>
+                    <tr>
+                        <th>قیمت کل</th>
+                        <th>{{ order_service.price }}</th>
+                    </tr>
+            </table>
+        </div>
+    {% else %}
+        <H1>هیچ سفارش مناسبی ثبت نشده</H1>
+    {% endif %}
+</div>
+{% endblock content %}

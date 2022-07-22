@@ -14,14 +14,16 @@
 {% block title %}Pick your service{% endblock title %}
 
 {% block content %}
+
 {% if services %}
 
     <div align='center'>
         <h1>Choose your services:</h1>
     </div>
 
-    <form action="{% url 'services:order' %}" method="post">
-        {% csrf_token %}
+    <!--<form action="{% url 'services:order' %}" method="post">-->
+    <form action="{% url 'services:order' %}" method="GET">
+        <!--{% csrf_token %}-->
         <table>
             {% for service in services.all %}
                 <tr>
