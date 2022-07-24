@@ -63,24 +63,27 @@ class Blog(models.Model):
     
 
 class Comment(models.Model):
+    sub = models.ForeignKey('self', on_delete=models.CASCADE, related_name='comment_sub', blank=True, null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              verbose_name=_('user'),
                              on_delete=models.SET_NULL,
                              related_name='comment_user',
                              blank=True,
                              null=True)
+    name = models.CharField(verbose_name=_('name'), max_length=50, default='ناشناس')
     content = models.TextField(verbose_name=_('content'), blank=True, null=True)
     like = models.PositiveIntegerField(verbose_name=_('like'), default=0)
     dislike = models.PositiveIntegerField(verbose_name=_('dislike'), default=0)
     created = models.DateTimeField(verbose_name=_('created'), auto_now_add=True)
     updated = models.DateTimeField(verbose_name=_('updated'), auto_now=True)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, blank=True, null=True)
+    object_id = models.PositiveIntegerField(blank=True, null=True)
     content_object = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self) -> str:
         if self.user:
-            return f'comment {self.id} by {self.user.name}'
+            return f'comment {self.id} by {self.user.username}'
+        return f'Comment({self.id})'
 
 
 class File(models.Model):

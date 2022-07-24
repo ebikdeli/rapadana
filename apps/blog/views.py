@@ -1,12 +1,14 @@
 from django.shortcuts import render, HttpResponse, redirect
+from django.http import JsonResponse
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.views.generic import ListView, DetailView, CreateView,\
     UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.urls import reverse as rev
 from django_hosts.resolvers import reverse_lazy, reverse, reverse_host
 
-from .models import Blog
+from .models import Blog, Comment
 from .forms import BlogModelForm
 
 
@@ -76,6 +78,83 @@ class BlogDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     """Only authorized users can delete a blog"""
     success_url = reverse_lazy('blog:blog_list', host='www', host_args=('www',), scheme=settings.MAIN_SCHEME, port=str(settings.MAIN_PORT))
     permission_required = ['accounts.can_create_blog', 'accounts.can_update_blog', 'accounts.can_delete_blog']
+
+
+def comment_blog_create(request, blog_slug=None):
+    """Create new comment for blog"""
+    if not blog_slug:
+        return HttpResponse(content="<div align='center'><h1>وبلاگی انتخاب نشده</h1></div>")
+
+    if request.method == "POST":
+        if not request.POST:
+            return HttpResponse('<div align="center"><h1>هیچ کامنتی وارد نشده</h1></div>')
+        
+        # Proccess received data
+        data = dict(request.POST)
+        csrf_token = data.pop('csrfmiddlewaretoken')[0]
+        blog_id = data['blog_id'][0]
+        name = data['name'][0]
+        content = data['content'][0]
+        user = request.user if request.user.is_authenticated else None
+
+        # Get parent comment if there is any
+        parent_comment_id = data['comment_id'][0] if data['parent_comment_id'][0] else None
+        parent_comment = None
+        if parent_comment_id:
+            parent_comment = Comment.objects.get(id=parent_comment_id) if Comment.objects.filter(id=parent_comment_id).exists() else None
+            
+        # Get the blog specs we want add the new comment to it
+        blog = Blog.objects.get(id=blog_id)
+        blog_ct = ContentType.objects.get_for_model(Blog)   # Or: ContentType.objects.get_for_model(app_label='blog', model='blog')
+
+        # Create comment
+        comment = Comment.objects.create(sub=parent_comment,
+                                         user=user,
+                                         name=name,
+                                         content=content,
+                                         content_type=blog_ct,
+                                         object_id=blog.id)
+        # comment = Blog.objects.get(id=blog_id).comments.create(sub=parent_comment_id, user=user, content=content)  <== This one is no good
+        print(comment, '    ', comment.content)
+        # Redirect user back to the latest blog
+        return redirect('blog:blog_detail', slug=blog_slug)
+    
+    else:
+        return JsonResponse(data={'Status': 'NOK', 'error': f'"{request.method}" does not supported'}, safe=False)
+
+
+def comment_blog_update(request, blog_slug=None):
+    """Update the blog created by user"""
+    if not blog_slug:
+        return HttpResponse('<div align="center"><h1>هیچ کامنتی وارد نشده</h1></div>')
+
+    if request.method == 'POST':
+        # Proccess received data
+        data = dict(request.POST)
+        csrf_token = data.pop('csrfmiddlewaretoken')[0]
+        # blog_id = data['blog_id'][0]
+        name = data['name'][0]
+        content = data['content'][0]
+        user = request.user if request.user.is_authenticated else None
+        comment_id = data['comment_id'][0]
+
+        # Get parent comment if there is any
+        parent_comment_id = data['comment_id'][0] if data['parent_comment_id'][0] else None
+        parent_comment = None
+        if parent_comment_id:
+            parent_comment = Comment.objects.get(id=parent_comment_id) if Comment.objects.filter(id=parent_comment_id).exists() else None
+
+        # Enforce the received changes and update the comment
+        comment = Comment.objects.get(id=comment_id)
+        if not comment.user:
+            comment.user = user
+        if parent_comment:
+            comment.sub = parent_comment
+        comment.update(name=name, content=content)
+        //
+
+    else:
+        return JsonResponse(data={'Status': 'NOK', 'error': f'"{request.method}" does not supported'}, safe=False)
 
 
 # Below views are test for html to pdf converter
