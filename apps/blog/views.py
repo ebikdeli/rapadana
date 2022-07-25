@@ -27,6 +27,7 @@ class BlogDetalView(DetailView):
     template_name = 'blog/templates/blog/blog_detail_view.html'
     model = Blog
     context_object_name = 'blog'
+    
 
 
 class BlogCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
@@ -80,6 +81,23 @@ class BlogDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     permission_required = ['accounts.can_create_blog', 'accounts.can_update_blog', 'accounts.can_delete_blog']
 
 
+class CommentBlogDetailView(DetailView):
+    """View each comment detail (not so functional!)"""
+    template_name: str = 'blog/templates/comment/comment_blog_detail.html'
+    model = Comment
+    context_object_name = 'comment'
+
+    def get_object(self, queryset):
+        """Override 'get_object' to only return if the selected comment written by current user or could be seen by admin."""
+        if self.request.user.is_staff:
+            return super().get_object(queryset)
+        #if self.
+    
+    def comment_written_by_who(self):
+        """This method shows comment detail only to user"""
+
+
+
 def comment_blog_create(request, blog_slug=None):
     """Create new comment for blog"""
     if not blog_slug:
@@ -116,7 +134,7 @@ def comment_blog_create(request, blog_slug=None):
                                          object_id=blog.id)
         # comment = Blog.objects.get(id=blog_id).comments.create(sub=parent_comment_id, user=user, content=content)  <== This one is no good
         print(comment, '    ', comment.content)
-        # Redirect user back to the latest blog
+        # Redirect user back to the last blog
         return redirect('blog:blog_detail', slug=blog_slug)
     
     else:
@@ -151,10 +169,35 @@ def comment_blog_update(request, blog_slug=None):
         if parent_comment:
             comment.sub = parent_comment
         comment.update(name=name, content=content)
-        //
+        comment.refresh_from_db()
+        print(comment)
+        # Redirect user back to the last blog
+        return redirect('blog:blog_detail', slug=blog_slug)
 
     else:
         return JsonResponse(data={'Status': 'NOK', 'error': f'"{request.method}" does not supported'}, safe=False)
+
+
+def comment_blog_delete(request, blog_slug=None):
+    """Delete the comment by the writer"""
+    if not blog_slug:
+        return HttpResponse('<div align="center"><h1>هیچ کامنتی وارد نشده</h1></div>')
+
+    if request.method == 'POST':
+        # Process received data
+        data = dict(request.POST)
+        comment_id = data['comment_id'][0]
+
+        # Query the comment with received 'id' then delete it
+        Comment.objects.get(id=comment_id).delete()
+        print('comment deleted')
+        # Redirect user back to the last blog
+        return redirect('blog:blog_detail', slug=blog_slug)
+
+    else:
+        return JsonResponse(data={'Status': 'NOK', 'error': f'"{request.method}" does not supported'}, safe=False)
+
+
 
 
 # Below views are test for html to pdf converter

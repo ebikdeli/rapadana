@@ -21,7 +21,14 @@ from apps.core.sitemaps import IndexStaicSitemap
 def index(request):
     from constance import config
     print('"constance" discount percent: ', config.discount)
+    # Set session
+    request.session['aut'] = True if request.user.is_authenticated else False
+    
+    print(request.COOKIES)
+    for k, v in request.session.items():
+        print(k, '    ', v)
     data = ['welcome to bigtek. It\'s showing API works properly', {'status_code': 200, 'verify': 'OK'}]
+    print(request.session.session_key)
     response = JsonResponse(data=data, safe=False)
 
     head = {'name': 'ehsan', 'age': 30}

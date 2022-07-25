@@ -71,6 +71,7 @@ class Comment(models.Model):
                              blank=True,
                              null=True)
     name = models.CharField(verbose_name=_('name'), max_length=50, default='ناشناس')
+    session_id = models.CharField(verbose_name=_('session id'), max_length=30, blank=True)
     content = models.TextField(verbose_name=_('content'), blank=True, null=True)
     like = models.PositiveIntegerField(verbose_name=_('like'), default=0)
     dislike = models.PositiveIntegerField(verbose_name=_('dislike'), default=0)

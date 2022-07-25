@@ -15,7 +15,12 @@ urlpatterns = [
     path('update/<slug:slug>/', views.BlogUpdateView.as_view(), name='blog_update'),
     path('delete/<slug:slug>/', views.BlogDeleteView.as_view(), name='blog_delete'),
     path('<slug:slug>/', views.BlogDetalView.as_view(), name='blog_detail'),
-    path('comment/create/<str:blog_slug>', views.comment_blog_create, name='comment_blog_create'),
+
+    # path(),
+    path('comment/create/<str:blog_slug>/', views.comment_blog_create, name='comment_blog_create'),
+    path('comment/update/<str:blog_slug/', views.comment_blog_update, name='comment_blog_update'),
+    path('comment/delete/<str:blog_slug>/', views.comment_blog_delete, name='comment_blog_delete'),
+
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
      name='django.contrib.sitemaps.views.sitemap'),
 
