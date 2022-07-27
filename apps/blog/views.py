@@ -87,16 +87,6 @@ class CommentBlogDetailView(DetailView):
     model = Comment
     context_object_name = 'comment'
 
-    def get_object(self, queryset):
-        """Override 'get_object' to only return if the selected comment written by current user or could be seen by admin."""
-        if self.request.user.is_staff:
-            return super().get_object(queryset)
-        #if self.
-    
-    def comment_written_by_who(self):
-        """This method shows comment detail only to user"""
-
-
 
 def comment_blog_create(request, blog_slug=None):
     """Create new comment for blog"""
@@ -129,6 +119,8 @@ def comment_blog_create(request, blog_slug=None):
         comment = Comment.objects.create(sub=parent_comment,
                                          user=user,
                                          name=name,
+                                         session_id=request.session.session_key,
+                                         ip_v4 = request.session['ip_v4'],
                                          content=content,
                                          content_type=blog_ct,
                                          object_id=blog.id)
@@ -206,6 +198,7 @@ def comment_blog_delete(request, blog_slug=None):
 from django.http import HttpResponse
 from django.views.generic import View
 from .process import html_to_pdf 
+
 
 #Creating a class based view
 class GeneratePdf(View):

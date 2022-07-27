@@ -9,6 +9,7 @@ from django.conf.urls.static import static
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.contrib.sitemaps.views import sitemap
+from constance import config
 
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail import urls as wagtail_urls
@@ -19,16 +20,15 @@ from apps.core.sitemaps import IndexStaicSitemap
 
 
 def index(request):
-    from constance import config
-    print('"constance" discount percent: ', config.discount)
+    # print('"constance" discount percent: ', config.discount)
     # Set session
     request.session['aut'] = True if request.user.is_authenticated else False
     
-    print(request.COOKIES)
-    for k, v in request.session.items():
-        print(k, '    ', v)
+    # print(request.COOKIES)
+    # for k, v in request.session.items():
+    #     print(k, '    ', v)
     data = ['welcome to bigtek. It\'s showing API works properly', {'status_code': 200, 'verify': 'OK'}]
-    print(request.session.session_key)
+    # print(request.session.session_key)
     response = JsonResponse(data=data, safe=False)
 
     head = {'name': 'ehsan', 'age': 30}

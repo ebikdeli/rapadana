@@ -132,6 +132,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.core.context_proccessors.get_user_ip_and_session_key',
                 # 'social_django.context_processors.backends',
                 # 'social_django.context_processors.login_redirect',
                 # 'cart.context_processor.cart_context'
