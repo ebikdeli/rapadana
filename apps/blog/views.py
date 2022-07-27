@@ -27,7 +27,14 @@ class BlogDetalView(DetailView):
     template_name = 'blog/templates/blog/blog_detail_view.html'
     model = Blog
     context_object_name = 'blog'
-    
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+        # current_blog = self.get_object()
+        # print(current_blog)
+        # blog_ct = ContentType.objects.get_for_model(current_blog)
+        # print(blog_ct)
 
 
 class BlogCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
@@ -104,9 +111,12 @@ def comment_blog_create(request, blog_slug=None):
         name = data['name'][0]
         content = data['content'][0]
         user = request.user if request.user.is_authenticated else None
-
+        print(data)
         # Get parent comment if there is any
-        parent_comment_id = data['comment_id'][0] if data['parent_comment_id'][0] else None
+        try:
+            parent_comment_id = data['comment_id'][0]
+        except KeyError:
+            parent_comment_id = None
         parent_comment = None
         if parent_comment_id:
             parent_comment = Comment.objects.get(id=parent_comment_id) if Comment.objects.filter(id=parent_comment_id).exists() else None
@@ -114,7 +124,8 @@ def comment_blog_create(request, blog_slug=None):
         # Get the blog specs we want add the new comment to it
         blog = Blog.objects.get(id=blog_id)
         blog_ct = ContentType.objects.get_for_model(Blog)   # Or: ContentType.objects.get_for_model(app_label='blog', model='blog')
-
+        print(blog, '   ', blog_ct)
+        exit()
         # Create comment
         comment = Comment.objects.create(sub=parent_comment,
                                          user=user,

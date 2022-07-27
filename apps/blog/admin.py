@@ -20,4 +20,4 @@ class BlogAdmin(AdminImageMixin, admin.ModelAdmin):
     form = BlogModelForm
 
 
-admin.register([Comment, File])
+admin.site.register([Comment, File])
