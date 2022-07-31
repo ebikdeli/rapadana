@@ -108,7 +108,7 @@ def comment_blog_create(request, blog_slug=None):
         data = dict(request.POST)
         csrf_token = data.pop('csrfmiddlewaretoken')[0]
         blog_id = data['blog_id'][0]
-        name = data['name'][0]
+        name = data['name'][0] if data['name'][0] else 'ناشناس'
         content = data['content'][0]
         user = request.user if request.user.is_authenticated else None
         print(data)
@@ -124,8 +124,8 @@ def comment_blog_create(request, blog_slug=None):
         # Get the blog specs we want add the new comment to it
         blog = Blog.objects.get(id=blog_id)
         blog_ct = ContentType.objects.get_for_model(Blog)   # Or: ContentType.objects.get_for_model(app_label='blog', model='blog')
-        print(blog, '   ', blog_ct)
-        exit()
+        # print(blog, '   ', blog_ct)
+        # exit()
         # Create comment
         comment = Comment.objects.create(sub=parent_comment,
                                          user=user,
