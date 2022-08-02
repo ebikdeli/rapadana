@@ -2,6 +2,8 @@ from django.test import TestCase, Client
 
 from .models import Customer, Order
 
+import decimal
+
 
 class TestCustomer(TestCase):
     def setUp(self) -> None:
@@ -60,3 +62,21 @@ class TestOrder(TestCase):
 
         Order.objects.filter(id=self.order.id).delete()
         self.assertFalse(Order.objects.filter(customer=self.customer).exists())
+    
+
+    def test_order_order_by_price(self):
+        """Test if bunch of orders could be ordered by price"""
+        order2 = Order.objects.create(customer=self.customer, price=decimal.Decimal(1000))
+        print("order2: ", order2.id)
+        order3 = Order.objects.create(customer=self.customer, price=decimal.Decimal(2000))
+        print("order3: ", order3.id)
+        order4 = Order.objects.create(customer=self.customer, price=decimal.Decimal(2000))
+        print("order4: ", order4.id)
+        order5 = Order.objects.create(customer=self.customer, price=decimal.Decimal(3000))
+        print("order5: ", order5.id)
+        order6 = Order.objects.create(customer=self.customer, price=decimal.Decimal(100))
+        print("order6: ", order6.id)
+        
+        orders = Order.objects.all().order_by('-price')
+        for order in orders:
+            print(order, ",   price: ", order.price)
